@@ -1,8 +1,15 @@
 import { Hono } from 'hono'
+import { serveStatic } from 'hono/bun'
 import { BaseLayout, DashboardLayout } from './layouts'
 import { LoginScreen, RegisterScreen } from './pages/AuthScreens'
+import  auth  from './features/auth/api'
 
 const app = new Hono()
+
+// Serve CSS file
+app.use('/output.css', serveStatic({ path: './src/output.css' }))
+
+app.route('/api', auth)
 
 app.get('/', (c) => {
   if (true) { // TODO: replace with actual authentication check
@@ -22,7 +29,14 @@ app.get('/dashboard', (c) => {
     hallOfResidence: "Chancellor Hall",
     role: "user"
   }
-  return c.html(<DashboardLayout title="Dashboard" user={user} />)})
+  
+  const toastParam = c.req.query('toast')
+  const showSuccessToast = toastParam === 'login_success'
+  
+  return c.html(
+    <DashboardLayout title="Dashboard" user={user}></DashboardLayout>
+  )
+})
 
 app.get('/login', (c) => {
   return c.html(
