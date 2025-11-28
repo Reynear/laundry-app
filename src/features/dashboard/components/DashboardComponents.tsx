@@ -168,13 +168,13 @@ export function ReminderCard({ title, time }: { title: string; time: string }) {
 export function NoticeCard({
 	title,
 	description,
-	author,
+	hallName,
 	time,
 	type = "info",
 }: {
 	title: string;
 	description: string;
-	author: string;
+	hallName: string;
 	time: string;
 	type?: "alert" | "info";
 }) {
@@ -208,7 +208,7 @@ export function NoticeCard({
 					<h4 class="text-sm font-bold text-slate-900">{title}</h4>
 					<p class="text-xs font-medium text-slate-600 mt-1">{description}</p>
 					<div class="flex items-center gap-2 mt-2">
-						<span class="text-xs font-medium text-slate-500">{author}</span>
+						<span class="text-xs font-medium text-slate-500">{hallName}</span>
 						<span class="text-xs text-slate-400">•</span>
 						<span class="text-xs font-medium text-slate-500">{time}</span>
 					</div>

@@ -65,7 +65,7 @@ export function NoticeBoard({
 								type={notice.type}
 								title={notice.title}
 								description={notice.content}
-								author={notice.authorName}
+								hallName={notice.hallName || "General"}
 								time={new Date(notice.publishedAt).toLocaleString()}
 							/>
 						))}
