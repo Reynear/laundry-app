@@ -237,6 +237,61 @@ export class AppointmentRepository {
 
 		return rows.map(mapToAppointment);
 	}
+
+	/**
+	 * Get appointments by hall (for staff view)
+	 */
+	async getAppointmentsByHall(
+		hallId: number,
+		filter: "upcoming" | "past" | "all" = "all",
+	): Promise<Appointment[]> {
+		const now = new Date();
+
+		let whereClause: ReturnType<typeof and> | undefined;
+		
+		// Base condition: match hallId
+		const hallCondition = eq(appointments.hallId, hallId);
+
+		if (filter === "upcoming") {
+			whereClause = and(
+				hallCondition,
+				gte(appointments.appointmentDatetime, now),
+				or(
+					eq(appointments.status, "pending"),
+					eq(appointments.status, "confirmed"),
+				),
+			);
+		} else if (filter === "past") {
+			whereClause = and(
+				hallCondition,
+				or(
+					lte(appointments.appointmentDatetime, now),
+					eq(appointments.status, "completed"),
+					eq(appointments.status, "cancelled"),
+					eq(appointments.status, "no_show"),
+				),
+			);
+		} else {
+			// All appointments for this hall
+			whereClause = hallCondition;
+		}
+
+		const rows = await db
+			.select({
+				...getTableColumns(appointments),
+				hallName: halls.name,
+			})
+			.from(appointments)
+			.leftJoin(halls, eq(appointments.hallId, halls.id))
+			.where(whereClause)
+			.orderBy(
+				filter === "past"
+					? desc(appointments.appointmentDatetime)
+					: appointments.appointmentDatetime,
+			);
+
+		return rows.map(mapToAppointment);
+	}
 }
 
 export const appointmentRepository = new AppointmentRepository();

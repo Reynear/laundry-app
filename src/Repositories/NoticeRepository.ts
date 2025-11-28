@@ -44,7 +44,10 @@ export class NoticeRepository {
 	/**
 	 * Get active notices (optionally filtered by hall)
 	 */
-	async getActiveNotices(hallId?: number): Promise<Notice[]> {
+	async getActiveNotices(
+		hallId?: number,
+		includeGlobal: boolean = true,
+	): Promise<Notice[]> {
 		const now = new Date();
 
 		const query = db
@@ -64,9 +67,11 @@ export class NoticeRepository {
 					lte(notices.publishedAt, now),
 					// Not expired yet (or no expiration)
 					or(isNull(notices.expiresAt), gte(notices.expiresAt, now)),
-					// Filter by hall if provided (include global notices where hallId is null)
+					// Filter by hall if provided
 					hallId !== undefined
-						? or(eq(notices.hallId, hallId), isNull(notices.hallId))
+						? includeGlobal
+							? or(eq(notices.hallId, hallId), isNull(notices.hallId))
+							: eq(notices.hallId, hallId)
 						: undefined,
 				),
 			)

@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { PaymentCard } from "../dashboard/components/DashboardComponents";
 import { DashboardLayout } from "../../layouts";
 import { BookAppointment } from "../../pages/client/BookAppointment";
+import { StaffAppointments } from "../../pages/staff/StaffAppointments";
 import {
 	appointmentRepository,
 	configRepository,
@@ -29,6 +30,20 @@ app.get("/", async (c) => {
 	// Get filter from query params
 	const filter =
 		(c.req.query("filter") as "upcoming" | "past" | "all") || "upcoming";
+
+	if (user.role === "staff") {
+		const appointments = await appointmentRepository.getAppointmentsByHall(
+			user.hallId,
+			filter,
+		);
+		return c.html(
+			<StaffAppointments
+				user={user}
+				appointments={appointments}
+				filter={filter}
+			/>,
+		);
+	}
 
 	const appointments = await appointmentRepository.getAllAppointments(filter);
 
