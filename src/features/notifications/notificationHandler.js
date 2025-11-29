@@ -137,7 +137,6 @@
 
 		const hasPerms = await requestPermission();
 		if (!hasPerms) {
-			console.log("Notification permission denied");
 			return;
 		}
 
