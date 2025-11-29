@@ -18,7 +18,6 @@ class MachineRepository {
 			type: row.type as MachineType,
 			durationMins: row.durationMins || 45,
 			status: row.status as MachineStatus,
-			pricePerCycle: row.pricePerCycle ? parseFloat(row.pricePerCycle) : 0,
 		}));
 	}
 
@@ -36,10 +35,8 @@ class MachineRepository {
 			type: row.type as MachineType,
 			durationMins: row.durationMins || 45,
 			status: row.status as MachineStatus,
-			pricePerCycle: row.pricePerCycle ? parseFloat(row.pricePerCycle) : 0,
 		};
 	}
-
 }
 
 export const machineRepository = new MachineRepository();

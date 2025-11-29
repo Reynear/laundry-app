@@ -12,18 +12,49 @@ import {
 // SEED DATA CONFIGURATION
 // =============================================================================
 
-const PRICES = {
-	washer: 250.0,
-	dryer: 200.0,
-};
-
 const HALLS_DATA = [
-	{ name: "Chancellor Hall", openingTime: "08:00", closingTime: "22:00" },
-	{ name: "Taylor Hall", openingTime: "08:00", closingTime: "22:00" },
-	{ name: "Preston Hall", openingTime: "08:00", closingTime: "22:00" },
-	{ name: "Irvine Hall", openingTime: "08:00", closingTime: "22:00" },
-	{ name: "Rex Nettleford Hall", openingTime: "08:00", closingTime: "22:00" },
-	{ name: "Mary Seacole Hall", openingTime: "08:00", closingTime: "22:00" },
+	{
+		name: "Chancellor Hall",
+		openingTime: "08:00",
+		closingTime: "22:00",
+		washerPrice: "250.00",
+		dryerPrice: "200.00",
+	},
+	{
+		name: "Taylor Hall",
+		openingTime: "08:00",
+		closingTime: "22:00",
+		washerPrice: "250.00",
+		dryerPrice: "200.00",
+	},
+	{
+		name: "Preston Hall",
+		openingTime: "08:00",
+		closingTime: "22:00",
+		washerPrice: "250.00",
+		dryerPrice: "200.00",
+	},
+	{
+		name: "Irvine Hall",
+		openingTime: "08:00",
+		closingTime: "22:00",
+		washerPrice: "250.00",
+		dryerPrice: "200.00",
+	},
+	{
+		name: "Rex Nettleford Hall",
+		openingTime: "08:00",
+		closingTime: "22:00",
+		washerPrice: "250.00",
+		dryerPrice: "200.00",
+	},
+	{
+		name: "Mary Seacole Hall",
+		openingTime: "08:00",
+		closingTime: "22:00",
+		washerPrice: "250.00",
+		dryerPrice: "200.00",
+	},
 ];
 
 const USERS_DATA = [
@@ -61,7 +92,6 @@ function generateMachinesForHall(hallId: number) {
 		type: "washer" | "dryer";
 		durationMins: number;
 		status: "available" | "in_use" | "out_of_service" | "maintenance";
-		pricePerCycle: string;
 	}> = [];
 
 	// 6 Washers per hall
@@ -74,7 +104,6 @@ function generateMachinesForHall(hallId: number) {
 			type: "washer",
 			durationMins: 45,
 			status: washerStatuses[i],
-			pricePerCycle: PRICES.washer.toString(),
 		});
 	}
 
@@ -88,7 +117,6 @@ function generateMachinesForHall(hallId: number) {
 			type: "dryer",
 			durationMins: 60,
 			status: dryerStatuses[i],
-			pricePerCycle: PRICES.dryer.toString(),
 		});
 	}
 
@@ -158,7 +186,6 @@ async function seed() {
 			type: "washer" | "dryer";
 			durationMins: number;
 			status: "available" | "in_use" | "out_of_service" | "maintenance";
-			pricePerCycle: string;
 		}> = [];
 		for (const hall of insertedHalls) {
 			allMachines.push(...generateMachinesForHall(hall.id));
@@ -193,6 +220,9 @@ async function seed() {
 			return date;
 		};
 
+		// Get prices from Chancellor Hall for sample appointments
+		const chancellorHallPrices = HALLS_DATA[0];
+
 		const appointmentsToInsert = [
 			{
 				userId: studentUser.id,
@@ -202,7 +232,7 @@ async function seed() {
 				durationMins: 45,
 				serviceType: "wash" as const,
 				status: "confirmed" as const,
-				totalCost: PRICES.washer.toString(),
+				totalCost: chancellorHallPrices.washerPrice,
 				createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000),
 			},
 			{
@@ -213,7 +243,7 @@ async function seed() {
 				durationMins: 60,
 				serviceType: "dry" as const,
 				status: "confirmed" as const,
-				totalCost: PRICES.dryer.toString(),
+				totalCost: chancellorHallPrices.dryerPrice,
 				createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000),
 			},
 			{
@@ -224,7 +254,7 @@ async function seed() {
 				durationMins: 45,
 				serviceType: "wash" as const,
 				status: "pending" as const,
-				totalCost: PRICES.washer.toString(),
+				totalCost: chancellorHallPrices.washerPrice,
 				createdAt: new Date(now.getTime() - 1 * 60 * 60 * 1000),
 			},
 			{
@@ -235,7 +265,7 @@ async function seed() {
 				durationMins: 45,
 				serviceType: "wash" as const,
 				status: "completed" as const,
-				totalCost: PRICES.washer.toString(),
+				totalCost: chancellorHallPrices.washerPrice,
 				createdAt: createDate(-2, 14, 0),
 			},
 		];

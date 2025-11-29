@@ -7,10 +7,10 @@ import { noticeRepository } from "../../Repositories/NoticeRepository";
 import { TimerCard } from "./components/DashboardComponents";
 import { getTimeRemaining } from "./helpers";
 
-const dashboard = new Hono<{ Variables: { user: any } }>();
+const dashboard = new Hono<{ Variables: { user: User } }>();
 
 dashboard.get("/", async (c) => {
-	const user = c.get("user") as any;
+	const user = c.get("user") as User;
 	const userId = user.id;
 
 	if (!user) {

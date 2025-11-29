@@ -273,7 +273,7 @@
     height: auto;
   }
   [hidden]:where(:not([hidden="until-found"])) {
-    display: none !important;
+    display: none;
   }
 }
 @layer utilities {
@@ -3873,7 +3873,7 @@
                 font-size: var(--text-sm);
                 line-height: var(--tw-leading, var(--text-sm--line-height));
                 &:is(:where(.group)[data-collapsible="icon"] *) {
-                  padding: calc(var(--spacing) * 0) !important;
+                  padding: calc(var(--spacing) * 0);
                 }
               }
             }

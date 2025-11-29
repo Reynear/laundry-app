@@ -73,6 +73,10 @@ export const halls = pgTable("halls", {
 	name: varchar("name", { length: 100 }).notNull(),
 	openingTime: varchar("opening_time", { length: 5 }), // e.g., "08:00"
 	closingTime: varchar("closing_time", { length: 5 }), // e.g., "22:00"
+	washerPrice: decimal("washer_price", { precision: 10, scale: 2 }).default(
+		"0",
+	),
+	dryerPrice: decimal("dryer_price", { precision: 10, scale: 2 }).default("0"),
 });
 
 export const machines = pgTable("machines", {
@@ -81,7 +85,6 @@ export const machines = pgTable("machines", {
 	type: machineTypeEnum("type").notNull(),
 	status: machineStatusEnum("status").default("available"),
 	durationMins: integer("duration_mins").default(45),
-	pricePerCycle: decimal("price_per_cycle", { precision: 10, scale: 2 }),
 });
 
 // Appointments & Sessions

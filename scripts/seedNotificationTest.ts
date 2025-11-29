@@ -56,6 +56,10 @@ async function seedNotificationTestAppointments() {
 
 		const now = new Date();
 
+		// Get pricing for the cost calculation
+		const price =
+			machine.type === "washer" ? hall.washerPrice : hall.dryerPrice;
+
 		console.log(`📅 Creating appointments for user: ${user.email}`);
 		console.log(`🏛️  Hall: ${hall.name}`);
 		console.log(`⏰ Current time: ${now.toLocaleTimeString()}\n`);
@@ -75,7 +79,7 @@ async function seedNotificationTestAppointments() {
 				durationMins: machine.type === "washer" ? 45 : 60,
 				serviceType: machine.type === "washer" ? "wash" : "dry",
 				status: "confirmed",
-				totalCost: machine.pricePerCycle || "250.00",
+				totalCost: price.toString(), // Convert number to string for decimal field
 			});
 
 			console.log(

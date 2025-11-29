@@ -27,6 +27,8 @@ type Hall = {
 	name: string;
 	openingTime: string; // "HH:MM" 24h format
 	closingTime: string; // "HH:MM" 24h format
+	washerPrice: number;
+	dryerPrice: number;
 };
 
 type Machine = {
@@ -35,7 +37,6 @@ type Machine = {
 	type: MachineType;
 	durationMins: number;
 	status: MachineStatus;
-	pricePerCycle: number;
 };
 
 type Appointment = {

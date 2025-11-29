@@ -16,6 +16,8 @@ class HallRepository {
 			name: row.name,
 			openingTime: row.openingTime,
 			closingTime: row.closingTime,
+			washerPrice: Number(row.washerPrice) || 0,
+			dryerPrice: Number(row.dryerPrice) || 0,
 		}));
 	}
 
@@ -32,6 +34,8 @@ class HallRepository {
 			name: row.name,
 			openingTime: row.openingTime,
 			closingTime: row.closingTime,
+			washerPrice: Number(row.washerPrice) || 0,
+			dryerPrice: Number(row.dryerPrice) || 0,
 		};
 	}
 
@@ -48,6 +52,8 @@ class HallRepository {
 			name: row.name,
 			openingTime: row.openingTime,
 			closingTime: row.closingTime,
+			washerPrice: Number(row.washerPrice) || 0,
+			dryerPrice: Number(row.dryerPrice) || 0,
 		};
 	}
 }

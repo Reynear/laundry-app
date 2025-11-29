@@ -4,7 +4,6 @@ import { BookAppointment } from "../../pages/client/BookAppointment";
 import { StaffAppointments } from "../../pages/staff/StaffAppointments";
 import {
 	appointmentRepository,
-	configRepository,
 	hallRepository,
 	paymentRepository,
 } from "../../Repositories";
@@ -146,10 +145,9 @@ app.get("/book", async (c) => {
 		}
 	}
 
-	// Get hall-specific prices and durations from database
-	const prices = await configRepository.getPricesByHall(hall.id);
-	const washerPrice = Number(prices.washer);
-	const dryerPrice = Number(prices.dryer);
+	// Get hall-specific prices directly from hall
+	const washerPrice = hall.washerPrice;
+	const dryerPrice = hall.dryerPrice;
 	const washDuration = await getMachineDuration(hall.id, "washer");
 	const dryDuration = await getMachineDuration(hall.id, "dryer");
 
@@ -290,9 +288,11 @@ app.get("/book/update", async (c) => {
 
 	if (hallIdStr) {
 		const hallId = Number(hallIdStr);
-		const prices = await configRepository.getPricesByHall(hallId);
-		washerPrice = Number(prices.washer);
-		dryerPrice = Number(prices.dryer);
+		const hall = await hallRepository.getHallById(hallId);
+		if (hall) {
+			washerPrice = hall.washerPrice;
+			dryerPrice = hall.dryerPrice;
+		}
 		washDuration = await getMachineDuration(hallId, "washer");
 		dryDuration = await getMachineDuration(hallId, "dryer");
 	}
@@ -361,10 +361,11 @@ app.post("/book", async (c) => {
 	const appointmentDatetime = new Date(dateStr);
 	appointmentDatetime.setHours(hours, minutes, 0, 0);
 
-	// Get hall-specific prices and machine durations from database
-	const prices = await configRepository.getPricesByHall(hallId);
-	const washerPrice = Number(prices.washer) || 0;
-	const dryerPrice = Number(prices.dryer) || 0;
+	// Get hall-specific prices and machine durations from hall directly
+	const hall = await hallRepository.getHallById(hallId);
+	if (!hall) return c.text("Hall not found", 404);
+	const washerPrice = hall.washerPrice;
+	const dryerPrice = hall.dryerPrice;
 	const washDuration = await getMachineDuration(hallId, "washer");
 	const dryDuration = await getMachineDuration(hallId, "dryer");
 

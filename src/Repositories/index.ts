@@ -1,5 +1,4 @@
 export * from "./AppointmentRepository";
-export * from "./ConfigRepository";
 export * from "./HallRepository";
 export * from "./MachineRepository";
 export * from "./MachineSessionRepository";

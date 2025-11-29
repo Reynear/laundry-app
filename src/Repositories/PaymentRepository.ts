@@ -102,7 +102,6 @@ class PaymentRepository {
 		return { success: true, newBalance };
 	}
 
-
 	/**
 	 * Validate that a user can book an appointment with the given cost
 	 * Returns validation result with current balance info
