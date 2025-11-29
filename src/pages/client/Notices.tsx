@@ -67,7 +67,7 @@ export function Notices({
 								type={notice.type}
 								title={notice.title}
 								description={notice.content}
-								author={notice.authorName}
+								hallName={notice.authorName}
 								time={new Date(notice.publishedAt).toLocaleString()}
 							/>
 						))}

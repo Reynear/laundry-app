@@ -7,7 +7,10 @@ import { users } from "../../db/schema/schema";
 
 const auth = new Hono();
 
-function loginFailed(c: any, message: string = "Invalid email or password") {
+// Extract the context type from Hono's route handler
+type HonoContext = Parameters<Parameters<typeof auth.get>[0]>[0];
+
+function loginFailed(c: HonoContext, message: string = "Invalid email or password") {
 	return c.html(
 		<Alert type="error" title="Login Failed" description={message} />,
 	);
@@ -68,7 +71,7 @@ auth.post("/register", async (c) => {
 	try {
 		const formData = await c.req.formData();
 		const email = formData.get("email") as string;
-		const password = formData.get("password") as string; // In real app, validate this!
+		const password = formData.get("password") as string;
 		const firstName = formData.get("firstName") as string;
 		const lastName = formData.get("lastName") as string;
 		const hallId = formData.get("hallId")

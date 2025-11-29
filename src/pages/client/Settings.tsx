@@ -1,6 +1,6 @@
 import { NotificationSettings } from "../../features/notifications/NotificationSettings";
 
-export function Settings({ user }: { user: User }) {
+export function Settings() {
 	return (
 		<main class="p-6">
 			<div class="max-w-2xl mx-auto">
