@@ -56,7 +56,11 @@ auth.post("/login", async (c) => {
 			},
 		);
 
-		c.header("HX-Redirect", "/dashboard?toast=login_success");
+		if (user.role === "staff") {
+			c.header("HX-Redirect", "/appointments?toast=login_success");
+		} else {
+			c.header("HX-Redirect", "/dashboard?toast=login_success");
+		}
 		return c.text("Redirecting...");
 	} catch (e) {
 		console.error(e);

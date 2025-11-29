@@ -18,6 +18,10 @@ dashboard.get("/", async (c) => {
 		return c.redirect("/login");
 	}
 
+	if (user.role === "staff") {
+		return c.redirect("/appointments");
+	}
+
 	const appointments =
 		await appointmentRepository.getUpcomingAppointments(userId);
 	const notices = await noticeRepository.getRecentNotices(3, user.hallId);

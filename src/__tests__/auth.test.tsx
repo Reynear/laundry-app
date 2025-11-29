@@ -54,6 +54,32 @@ describe("Auth API", () => {
       expect(res.headers.get("Set-Cookie")).toContain("sessionId");
     });
 
+    it("should login successfully as staff and redirect to appointments", async () => {
+      const passwordHash = await Bun.password.hash("staff123");
+
+      mockDb.limit.mockReturnValue([{
+        id: 2,
+        email: "staff@mymona.uwi.edu",
+        passwordHash,
+        role: "staff",
+      }]);
+
+      const formData = new FormData();
+      formData.append("email", "staff@mymona.uwi.edu");
+      formData.append("password", "staff123");
+
+      const req = new Request("http://localhost/login", {
+        method: "POST",
+        body: formData,
+      });
+
+      const res = await auth.request(req);
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe("Redirecting...");
+      expect(res.headers.get("HX-Redirect")).toBe("/appointments?toast=login_success");
+      expect(res.headers.get("Set-Cookie")).toContain("sessionId");
+    });
+
     it("should fail login with invalid password", async () => {
       const passwordHash = await Bun.password.hash("user123");
 
