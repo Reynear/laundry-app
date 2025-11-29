@@ -99,7 +99,7 @@ function LogoutButton() {
 	);
 }
 
-export function ClientSidebar({ user, currentPath }) {
+function ClientSidebar({ user, currentPath }) {
 	const links = [
 		{
 			href: "/dashboard",
@@ -238,7 +238,7 @@ export function ClientSidebar({ user, currentPath }) {
 	);
 }
 
-export function StaffSidebar({ user, currentPath }) {
+function StaffSidebar({ user, currentPath }) {
 	const links = [
 		{
 			href: "/appointments",

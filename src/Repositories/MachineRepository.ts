@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { machines } from "../db/schema/schema";
 
-export class MachineRepository {
+class MachineRepository {
 	/**
 	 * Get all machines for a hall
 	 */
@@ -40,51 +40,6 @@ export class MachineRepository {
 		};
 	}
 
-	/**
-	 * Find an available machine for a specific time slot
-	 * Note: This logic is largely handled in AppointmentRepository.createAppointment now,
-	 * but we keep this for potential utility use.
-	 */
-	async findAvailableMachineForAppointment(
-		hallId: number,
-		type: MachineType,
-		startTime: Date,
-		durationMins: number,
-		existingAppointments: {
-			machineId: number;
-			appointmentDatetime: Date;
-			durationMins: number;
-		}[],
-	): Promise<Machine | undefined> {
-		const hallMachines = await this.getMachinesByHall(hallId);
-		const candidateMachines = hallMachines.filter(
-			(m) =>
-				m.type === type &&
-				m.status !== "out_of_service" &&
-				m.status !== "maintenance",
-		);
-
-		const endTime = new Date(startTime.getTime() + durationMins * 60000);
-
-		// Find a machine that doesn't have a conflict
-		const availableMachine = candidateMachines.find((machine) => {
-			const hasConflict = existingAppointments.some((appt) => {
-				if (appt.machineId !== machine.id) return false;
-
-				const apptStart = appt.appointmentDatetime;
-				const apptEnd = new Date(
-					apptStart.getTime() + appt.durationMins * 60000,
-				);
-
-				// Check overlap
-				return apptStart < endTime && apptEnd > startTime;
-			});
-
-			return !hasConflict;
-		});
-
-		return availableMachine;
-	}
 }
 
 export const machineRepository = new MachineRepository();

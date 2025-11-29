@@ -5,7 +5,7 @@ import { halls } from "../db/schema/schema";
 /**
  * Repository for Hall data access
  */
-export class HallRepository {
+class HallRepository {
 	/**
 	 * Get all halls
 	 */

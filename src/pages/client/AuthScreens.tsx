@@ -3,7 +3,7 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Select } from "../../components/Select";
 
-export function LoginForm({ email }: { email?: string } = {}) {
+function LoginForm({ email }: { email?: string } = {}) {
 	return (
 		<form
 			id="loginForm"

@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { payments, users } from "../db/schema/schema";
 
-export class PaymentRepository {
+class PaymentRepository {
 	/**
 	 * Get the current wallet balance for a user
 	 */
@@ -102,29 +102,6 @@ export class PaymentRepository {
 		return { success: true, newBalance };
 	}
 
-	/**
-	 * Record a payment transaction (for manual logging)
-	 */
-	async recordPayment(data: {
-		userId: number;
-		amount: number;
-		currency?: string;
-		status?: "pending" | "succeeded" | "failed";
-		stripePaymentId?: string;
-	}): Promise<number> {
-		const [payment] = await db
-			.insert(payments)
-			.values({
-				userId: data.userId,
-				amount: data.amount.toFixed(2),
-				currency: data.currency || "USD",
-				status: data.status || "pending",
-				stripePaymentId: data.stripePaymentId,
-			})
-			.returning({ id: payments.id });
-
-		return payment.id;
-	}
 
 	/**
 	 * Validate that a user can book an appointment with the given cost

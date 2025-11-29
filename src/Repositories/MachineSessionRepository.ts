@@ -27,7 +27,7 @@ function mapToSession(
 	};
 }
 
-export class MachineSessionRepository {
+class MachineSessionRepository {
 	/**
 	 * Get active sessions for a user
 	 */

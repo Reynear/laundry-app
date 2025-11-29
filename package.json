@@ -17,6 +17,7 @@
 		"basecoat-css": "^0.3.6",
 		"drizzle-orm": "^0.44.7",
 		"hono": "^4.10.7",
+		"knip": "^5.70.2",
 		"tailwindcss": "^4.1.17"
 	},
 	"devDependencies": {

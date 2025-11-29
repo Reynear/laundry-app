@@ -5,7 +5,7 @@ import { appointments, machines } from "../../../db/schema/schema";
 /**
  * Checks if machines of a specific type exist in a hall.
  */
-export async function checkMachinesExist(
+async function checkMachinesExist(
 	hallId: number,
 ): Promise<{ hasWashers: boolean; hasDryers: boolean }> {
 	const [washerCount] = await db

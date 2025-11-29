@@ -25,7 +25,7 @@ function mapToAppointment(row: AppointmentDbResult): Appointment {
 	};
 }
 
-export class AppointmentRepository {
+class AppointmentRepository {
 	/**
 	 * Get upcoming appointments for a user
 	 */

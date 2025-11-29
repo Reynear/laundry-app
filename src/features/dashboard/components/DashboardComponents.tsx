@@ -1,4 +1,4 @@
-export function MachineIcon({ type }) {
+function MachineIcon({ type }) {
 	const isWash =
 		type.toLowerCase() === "wash" || type.toLowerCase() === "washer";
 	const iconBg = isWash ? "bg-blue-100" : "bg-orange-100";

@@ -5,7 +5,7 @@ import * as schema from "./schema/schema";
 const connectionString = process.env.DATABASE_URL!;
 
 // Disable prefetch as it is not supported for "Transaction" pool mode
-export const client = postgres(connectionString, {
+const client = postgres(connectionString, {
 	prepare: false,
 	idle_timeout: 20,
 	max_lifetime: 60 * 30,

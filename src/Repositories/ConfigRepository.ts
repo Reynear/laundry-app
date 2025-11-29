@@ -6,7 +6,7 @@ import { machines } from "../db/schema/schema";
  * Repository for app configuration and pricing
  * Prices are derived from the machines table
  */
-export class ConfigRepository {
+class ConfigRepository {
 	/**
 	 * Get the standard price for a machine type (global fallback)
 	 * Returns the price from the first available machine of that type

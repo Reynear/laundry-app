@@ -40,7 +40,7 @@ function mapToNotice(row: NoticeDbResult): Notice {
 	};
 }
 
-export class NoticeRepository {
+class NoticeRepository {
 	/**
 	 * Get active notices (optionally filtered by hall)
 	 */
