@@ -137,17 +137,30 @@ export function AppointmentListItem({
 					<span class="text-lg font-bold text-slate-900">
 						{formatCurrency(appointment.totalCost)}
 					</span>
-					{(appointment.status === "pending" ||
-						appointment.status === "confirmed") && (
-						<button
-							type="button"
-							class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline mt-1"
-							hx-get={`/appointments/${appointment.id}/cancel-confirmation`}
-							hx-target="body"
-							hx-swap="beforeend"
-						>
-							Cancel Appointment
-						</button>
+					{/* Staff action buttons - show for confirmed appointments */}
+					{appointment.status === "confirmed" && (
+						<div class="flex gap-2 mt-1">
+							<button
+								type="button"
+								class="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+								hx-patch={`/appointments/${appointment.id}/status`}
+								hx-vals='{"status": "completed"}'
+								hx-target={`#appointment-item-${appointment.id}`}
+								hx-swap="outerHTML"
+							>
+								Mark Completed
+							</button>
+							<button
+								type="button"
+								class="px-3 py-1.5 text-xs font-medium bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+								hx-patch={`/appointments/${appointment.id}/status`}
+								hx-vals='{"status": "no_show"}'
+								hx-target={`#appointment-item-${appointment.id}`}
+								hx-swap="outerHTML"
+							>
+								Mark No-Show
+							</button>
+						</div>
 					)}
 				</div>
 			</div>

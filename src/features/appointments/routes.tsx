@@ -17,6 +17,7 @@ import {
 	getMachineDuration,
 } from "./AppointmentScheduler/SlotValidator";
 import { AppointmentListContainer } from "./components/AppointmentListContainer";
+import { AppointmentListItem } from "./components/AppointmentListItem";
 import { BookingSummary } from "./components/BookingSummary";
 import { formatCurrency } from "./utils";
 
@@ -556,6 +557,27 @@ app.delete("/:id", async (c) => {
 	}
 
 	return c.text("Failed to cancel appointment", 500);
+});
+
+// PATCH endpoint for updating appointment status
+app.patch("/:id/status", async (c) => {
+	const id = Number.parseInt(c.req.param("id"), 10);
+	const body = await c.req.parseBody();
+	const status = body.status as "completed" | "no_show";
+
+	// Validate status
+	if (status !== "completed" && status !== "no_show") {
+		return c.text("Invalid status. Must be 'completed' or 'no_show'", 400);
+	}
+
+	const appointment = await appointmentRepository.updateStatus(id, status);
+
+	if (!appointment) {
+		return c.text("Appointment not found", 404);
+	}
+
+	// Return updated appointment item
+	return c.html(<AppointmentListItem appointment={appointment} />);
 });
 
 export default app;

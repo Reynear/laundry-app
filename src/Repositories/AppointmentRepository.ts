@@ -149,7 +149,7 @@ class AppointmentRepository {
 				appointmentDatetime: data.appointmentDatetime,
 				durationMins: data.durationMins,
 				serviceType: data.serviceType,
-				status: "pending",
+				status: "confirmed",
 				totalCost: data.totalCost,
 			})
 			.returning();
@@ -193,6 +193,34 @@ class AppointmentRepository {
 			.where(eq(appointments.id, id))
 			.returning();
 		return result.length > 0;
+	}
+
+	/**
+	 * Update appointment status
+	 */
+	async updateStatus(
+		id: number,
+		status: AppointmentStatus,
+	): Promise<Appointment | null> {
+		const [updated] = await db
+			.update(appointments)
+			.set({ status })
+			.where(eq(appointments.id, id))
+			.returning();
+
+		if (!updated) return null;
+
+		// Fetch with hall name
+		const [appointmentWithHall] = await db
+			.select({
+				...getTableColumns(appointments),
+				hallName: halls.name,
+			})
+			.from(appointments)
+			.leftJoin(halls, eq(appointments.hallId, halls.id))
+			.where(eq(appointments.id, id));
+
+		return mapToAppointment(appointmentWithHall);
 	}
 
 	/**

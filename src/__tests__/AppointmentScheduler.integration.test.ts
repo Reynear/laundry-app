@@ -47,7 +47,7 @@ function createAppointment(
 		appointmentDatetime: new Date("2025-12-01T10:00:00"),
 		durationMins: 45,
 		serviceType: "wash" as const,
-		status: "pending" as const,
+		status: "confirmed" as const,
 		...overrides,
 	};
 }
