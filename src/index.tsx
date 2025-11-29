@@ -24,10 +24,7 @@ app.use(
 	"/notificationHandler.js",
 	serveStatic({ path: "./src/features/notifications/notificationHandler.js" }),
 );
-app.use(
-	"/favicon.ico",
-	serveStatic({ path: "./src/favicon.ico" }),
-);
+app.use("/favicon.ico", serveStatic({ path: "./src/favicon.ico" }));
 
 // Public Routes
 app.route("/api", auth);

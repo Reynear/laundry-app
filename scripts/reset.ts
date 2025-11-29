@@ -66,7 +66,9 @@ async function reset() {
 			// Import and run seed script
 			await import("./seed");
 		} else {
-			console.log("💡 Tip: Run 'bun run db:reset --seed' to reset and seed in one command\n");
+			console.log(
+				"💡 Tip: Run 'bun run db:reset --seed' to reset and seed in one command\n",
+			);
 		}
 	} catch (error) {
 		console.error("❌ Database reset failed:", error);

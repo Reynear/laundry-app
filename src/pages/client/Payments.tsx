@@ -10,7 +10,9 @@ export function Payments({ user }: { user: User }) {
 					<div class="space-y-4">
 						<div class="flex justify-between items-center pb-4 border-b border-slate-200">
 							<span class="text-gray-600">Current Balance</span>
-							<span class="text-2xl font-bold text-gray-900">{formatCurrency(user.walletBalance)}</span>
+							<span class="text-2xl font-bold text-gray-900">
+								{formatCurrency(user.walletBalance)}
+							</span>
 						</div>
 
 						<div class="py-4">

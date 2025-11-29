@@ -146,7 +146,9 @@ export function BookingFlow({
 								</div>
 							</div>
 							<h3 class="text-sm font-bold text-gray-900 mb-1">Wash Only</h3>
-							<p class="text-xs text-gray-500 mb-2">{formatDuration(washDuration)}</p>
+							<p class="text-xs text-gray-500 mb-2">
+								{formatDuration(washDuration)}
+							</p>
 							<p class="text-lg font-bold text-gray-900">
 								<span id="wash-price">{formatCurrency(washerPrice)}</span>
 							</p>
@@ -183,7 +185,9 @@ export function BookingFlow({
 								</div>
 							</div>
 							<h3 class="text-sm font-bold text-gray-900 mb-1">Dry Only</h3>
-							<p class="text-xs text-gray-500 mb-2">{formatDuration(dryDuration)}</p>
+							<p class="text-xs text-gray-500 mb-2">
+								{formatDuration(dryDuration)}
+							</p>
 							<p class="text-lg font-bold text-gray-900">
 								<span id="dry-price">{formatCurrency(dryerPrice)}</span>
 							</p>
@@ -220,7 +224,9 @@ export function BookingFlow({
 								</div>
 							</div>
 							<h3 class="text-sm font-bold text-gray-900 mb-1">Wash & Dry</h3>
-							<p class="text-xs text-gray-500 mb-2">{formatDuration(washDryDuration)}</p>
+							<p class="text-xs text-gray-500 mb-2">
+								{formatDuration(washDryDuration)}
+							</p>
 							<p class="text-lg font-bold text-gray-900">
 								<span id="wash-dry-price">
 									{formatCurrency(washerPrice + dryerPrice)}

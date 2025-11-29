@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { payments, users } from "../db/schema/schema";
 
@@ -151,4 +151,3 @@ export class PaymentRepository {
 }
 
 export const paymentRepository = new PaymentRepository();
-

@@ -65,16 +65,21 @@ function updateConfirmButton() {
 	const confirmBtn = document.getElementById("confirm-booking-btn");
 	if (!confirmBtn) return;
 
-	const isFormValid = state.hallId && state.date && state.serviceType && state.time;
-	
+	const isFormValid =
+		state.hallId && state.date && state.serviceType && state.time;
+
 	// Check if user has enough credits (set server-side via data attribute)
 	const hasEnoughCredits = confirmBtn.dataset.hasEnoughCredits === "true";
-	
+
 	const canBook = isFormValid && hasEnoughCredits;
 
 	if (canBook) {
 		confirmBtn.removeAttribute("disabled");
-		confirmBtn.classList.remove("bg-gray-300", "bg-red-300", "cursor-not-allowed");
+		confirmBtn.classList.remove(
+			"bg-gray-300",
+			"bg-red-300",
+			"cursor-not-allowed",
+		);
 		confirmBtn.classList.add(
 			"bg-slate-800",
 			"text-white",
@@ -105,7 +110,7 @@ function updateConfirmButton() {
 			"shadow-md",
 			"hover:shadow-lg",
 		);
-		
+
 		// Show different styling if insufficient credits vs incomplete form
 		if (isFormValid && !hasEnoughCredits) {
 			confirmBtn.classList.remove("bg-gray-300");
@@ -364,7 +369,11 @@ function initializeBookingApp() {
 				date: dataset.activeDate || "",
 				dateDisplay: dataset.dateDisplay || "",
 				serviceType: dataset.serviceType || "",
-				serviceDuration: inferDuration(dataset.serviceType, washDuration, dryDuration),
+				serviceDuration: inferDuration(
+					dataset.serviceType,
+					washDuration,
+					dryDuration,
+				),
 				loads: Number(dataset.loads) || 1,
 				washerPrice: Number(dataset.washerPrice) || 0,
 				dryerPrice: Number(dataset.dryerPrice) || 0,

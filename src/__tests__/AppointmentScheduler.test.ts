@@ -24,7 +24,10 @@ mock.module("../../Repositories", () => ({
 
 // Import after mocking - use new module structure
 import { getServiceDetailsSync } from "../features/appointments/AppointmentScheduler/ServiceDetails";
-import { formatCurrency, generateNext7Days } from "../features/appointments/utils";
+import {
+	formatCurrency,
+	generateNext7Days,
+} from "../features/appointments/utils";
 
 describe("AppointmentScheduler Module", () => {
 	beforeEach(() => {
@@ -139,7 +142,7 @@ describe("AppointmentScheduler Module", () => {
 				// PARALLEL: All N loads run simultaneously
 				// Each load: wash (45 mins) then dry (60 mins)
 				// Total duration: 45 + 60 = 105 mins (NOT scaled by load count)
-				const loadCount = 3;
+				const _loadCount = 3;
 				const washDuration = 45;
 				const dryDuration = 60;
 
@@ -207,7 +210,7 @@ describe("AppointmentScheduler Module", () => {
 				// T=105:   All 3 drys end
 				//
 				// Total duration: 45 + 60 = 105 mins (NOT scaled by load count)
-				const loadCount = 3;
+				const _loadCount = 3;
 				const parallelDuration = 45 + 60;
 
 				expect(parallelDuration).toBe(105); // 1.75 hours

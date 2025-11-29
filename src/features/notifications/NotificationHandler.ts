@@ -1,7 +1,7 @@
 import type {
+	ActiveSession,
 	NotificationSettings,
 	UpcomingAppointment,
-	ActiveSession,
 } from "./types";
 
 // Default settings

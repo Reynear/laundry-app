@@ -1,7 +1,5 @@
 // NotificationHandler - Client-side notification manager
-(function () {
-	"use strict";
-
+(() => {
 	// Default settings
 	const DEFAULT_SETTINGS = {
 		enabled: true,
@@ -70,7 +68,7 @@
 		});
 
 		// Auto-close after 10 seconds
-		setTimeout(function () {
+		setTimeout(() => {
 			notification.close();
 		}, 10000);
 
@@ -104,7 +102,7 @@
 						" is in " +
 						appt.minutesUntil +
 						" minutes",
-					tag: "appointment-" + appt.id,
+					tag: `appointment-${appt.id}`,
 				});
 
 				notifiedAppointments.add(appt.id);

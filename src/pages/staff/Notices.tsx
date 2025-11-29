@@ -112,7 +112,9 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 										</button>
 									</div>
 								</div>
-								<p class="text-slate-600 whitespace-pre-wrap">{notice.content}</p>
+								<p class="text-slate-600 whitespace-pre-wrap">
+									{notice.content}
+								</p>
 							</div>
 						))
 					) : (
@@ -142,22 +144,43 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 				</div>
 
 				{/* Create Notice Modal */}
-				<dialog id="create-notice-modal" class="rounded-xl shadow-xl p-0 backdrop:bg-slate-900/50">
+				<dialog
+					id="create-notice-modal"
+					class="rounded-xl shadow-xl p-0 backdrop:bg-slate-900/50"
+				>
 					<div class="w-full max-w-lg bg-white rounded-xl overflow-hidden">
 						<div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-							<h3 class="font-bold text-lg text-slate-900">Create New Notice</h3>
+							<h3 class="font-bold text-lg text-slate-900">
+								Create New Notice
+							</h3>
 							<form method="dialog">
-								<button type="submit" class="text-slate-400 hover:text-slate-600 transition-colors">
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<button
+									type="submit"
+									class="text-slate-400 hover:text-slate-600 transition-colors"
+								>
+									<svg
+										class="w-5 h-5"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
 										<title>Close</title>
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M6 18L18 6M6 6l12 12"
+										/>
 									</svg>
 								</button>
 							</form>
 						</div>
 						<form action="/notices" method="post" class="p-6 space-y-4">
 							<div>
-								<label for="title-input" class="block text-sm font-medium text-slate-700 mb-1">
+								<label
+									for="title-input"
+									class="block text-sm font-medium text-slate-700 mb-1"
+								>
 									Title
 								</label>
 								<input
@@ -169,25 +192,39 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 									placeholder="e.g., Water Maintenance"
 								/>
 							</div>
-							
+
 							<div>
 								<span class="block text-sm font-medium text-slate-700 mb-1">
 									Type
 								</span>
 								<div class="flex gap-4">
 									<label class="flex items-center gap-2 cursor-pointer">
-										<input type="radio" name="priority" value="info" checked class="text-blue-600 focus:ring-blue-500" />
+										<input
+											type="radio"
+											name="priority"
+											value="info"
+											checked
+											class="text-blue-600 focus:ring-blue-500"
+										/>
 										<span class="text-sm text-slate-600">Information</span>
 									</label>
 									<label class="flex items-center gap-2 cursor-pointer">
-										<input type="radio" name="priority" value="urgent" class="text-red-600 focus:ring-red-500" />
+										<input
+											type="radio"
+											name="priority"
+											value="urgent"
+											class="text-red-600 focus:ring-red-500"
+										/>
 										<span class="text-sm text-slate-600">Alert / Urgent</span>
 									</label>
 								</div>
 							</div>
 
 							<div>
-								<label for="content-input" class="block text-sm font-medium text-slate-700 mb-1">
+								<label
+									for="content-input"
+									class="block text-sm font-medium text-slate-700 mb-1"
+								>
 									Content
 								</label>
 								<textarea
@@ -201,7 +238,10 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 							</div>
 
 							<div class="pt-2 flex justify-end">
-								<button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-200 transition-all">
+								<button
+									type="submit"
+									class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-200 transition-all"
+								>
 									Post Notice
 								</button>
 							</div>
@@ -210,16 +250,24 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 				</dialog>
 
 				{/* Edit Notice Modal */}
-				<dialog id="edit-notice-modal" class="rounded-xl shadow-xl p-0 backdrop:bg-slate-900/50">
-					<div id="edit-modal-content" class="w-full max-w-lg bg-white rounded-xl overflow-hidden">
+				<dialog
+					id="edit-notice-modal"
+					class="rounded-xl shadow-xl p-0 backdrop:bg-slate-900/50"
+				>
+					<div
+						id="edit-modal-content"
+						class="w-full max-w-lg bg-white rounded-xl overflow-hidden"
+					>
 						{/* Content will be loaded here via HTMX */}
 						<div class="p-12 text-center">
 							<div class="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
 						</div>
 					</div>
 				</dialog>
-				
-				<script dangerouslySetInnerHTML={{ __html: `
+
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
 					function openCreateModal() {
 						const modal = document.getElementById('create-notice-modal');
 						if (modal) modal.showModal();
@@ -228,7 +276,9 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 						const modal = document.getElementById('edit-notice-modal');
 						if (modal) modal.showModal();
 					}
-				`}} />
+				`,
+					}}
+				/>
 			</div>
 		</DashboardLayout>
 	);

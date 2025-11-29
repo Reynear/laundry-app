@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { PaymentCard } from "../dashboard/components/DashboardComponents";
 import { DashboardLayout } from "../../layouts";
 import { BookAppointment } from "../../pages/client/BookAppointment";
 import { StaffAppointments } from "../../pages/staff/StaffAppointments";
@@ -9,6 +8,7 @@ import {
 	hallRepository,
 	paymentRepository,
 } from "../../Repositories";
+import { PaymentCard } from "../dashboard/components/DashboardComponents";
 import {
 	cancelReservation,
 	createReservation,
@@ -396,7 +396,8 @@ app.post("/book", async (c) => {
 				<span class="block sm:inline">
 					{" "}
 					You need {formatCurrency(creditValidation.shortfall)} more to complete
-					this booking. Current balance: {formatCurrency(creditValidation.currentBalance)}
+					this booking. Current balance:{" "}
+					{formatCurrency(creditValidation.currentBalance)}
 				</span>
 				<button
 					type="button"

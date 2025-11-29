@@ -4,7 +4,6 @@ import { Dashboard } from "../../pages/dashboard";
 import { appointmentRepository } from "../../Repositories/AppointmentRepository";
 import { machineSessionRepository } from "../../Repositories/MachineSessionRepository";
 import { noticeRepository } from "../../Repositories/NoticeRepository";
-import { userRepository } from "../../Repositories/UserRepository";
 import { TimerCard } from "./components/DashboardComponents";
 import { getTimeRemaining } from "./helpers";
 

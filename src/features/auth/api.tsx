@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
+import { deleteCookie, setSignedCookie } from "hono/cookie";
 import { Alert } from "../../components/Alert";
 import { db } from "../../db";
 import { users } from "../../db/schema/schema";
@@ -9,11 +9,7 @@ const auth = new Hono();
 
 function loginFailed(c: any, message: string = "Invalid email or password") {
 	return c.html(
-		<Alert
-			type="error"
-			title="Login Failed"
-			description={message}
-		/>,
+		<Alert type="error" title="Login Failed" description={message} />,
 	);
 }
 
@@ -75,19 +71,29 @@ auth.post("/register", async (c) => {
 		const password = formData.get("password") as string; // In real app, validate this!
 		const firstName = formData.get("firstName") as string;
 		const lastName = formData.get("lastName") as string;
-		const hallId = formData.get("hallId") ? parseInt(formData.get("hallId") as string) : undefined;
+		const hallId = formData.get("hallId")
+			? parseInt(formData.get("hallId") as string, 10)
+			: undefined;
 
 		if (!email || !password) {
 			return c.html(
-				<Alert type="error" title="Error" description="Email and password are required" />
+				<Alert
+					type="error"
+					title="Error"
+					description="Email and password are required"
+				/>,
 			);
 		}
 
 		// Check existing
-		const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+		const [existing] = await db
+			.select()
+			.from(users)
+			.where(eq(users.email, email))
+			.limit(1);
 		if (existing) {
 			return c.html(
-				<Alert type="error" title="Error" description="User already exists" />
+				<Alert type="error" title="Error" description="User already exists" />,
 			);
 		}
 
@@ -104,11 +110,15 @@ auth.post("/register", async (c) => {
 		});
 
 		// Fetch the newly created user
-		const [newUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+		const [newUser] = await db
+			.select()
+			.from(users)
+			.where(eq(users.email, email))
+			.limit(1);
 
 		if (!newUser) {
 			return c.html(
-				<Alert type="error" title="Error" description="Registration failed" />
+				<Alert type="error" title="Error" description="Registration failed" />,
 			);
 		}
 
@@ -129,11 +139,10 @@ auth.post("/register", async (c) => {
 
 		c.header("HX-Redirect", "/dashboard?toast=welcome");
 		return c.text("Redirecting...");
-
 	} catch (e) {
 		console.error(e);
 		return c.html(
-			<Alert type="error" title="Error" description="Registration failed" />
+			<Alert type="error" title="Error" description="Registration failed" />,
 		);
 	}
 });
