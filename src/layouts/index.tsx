@@ -9,6 +9,7 @@ export function BaseLayout({ children, title }) {
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<link rel="stylesheet" href="/output.css" />
 				<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+				<script src="/notificationHandler.js"></script>
 			</head>
 			<body>{children}</body>
 		</html>

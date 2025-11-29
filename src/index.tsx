@@ -7,6 +7,7 @@ import auth from "./features/auth/api";
 import authPages from "./features/auth/routes";
 import dashboard from "./features/dashboard/routes";
 import notices from "./features/notices/routes";
+import notifications from "./features/notifications/routes";
 import payments from "./features/payments/routes";
 import settings from "./features/settings/routes";
 import { userRepository } from "./Repositories/UserRepository";
@@ -18,6 +19,14 @@ app.use("/output.css", serveStatic({ path: "./src/output.css" }));
 app.use(
 	"/bookingScript.js",
 	serveStatic({ path: "./src/features/appointments/bookingScript.js" }),
+);
+app.use(
+	"/notificationHandler.js",
+	serveStatic({ path: "./src/features/notifications/notificationHandler.js" }),
+);
+app.use(
+	"/favicon.ico",
+	serveStatic({ path: "./src/favicon.ico" }),
 );
 
 // Public Routes
@@ -52,12 +61,14 @@ app.use("/appointments/*", authMiddleware);
 app.use("/notices/*", authMiddleware);
 app.use("/payments/*", authMiddleware);
 app.use("/settings/*", authMiddleware);
+app.use("/api/notifications/*", authMiddleware);
 
 app.route("/dashboard", dashboard);
 app.route("/appointments", appointments);
 app.route("/notices", notices);
 app.route("/payments", payments);
 app.route("/settings", settings);
+app.route("/api/notifications", notifications);
 
 app.get("/", async (c) => {
 	const sessionId = await getSignedCookie(

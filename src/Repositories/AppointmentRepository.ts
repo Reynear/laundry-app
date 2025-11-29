@@ -1,4 +1,4 @@
-import { and, desc, eq, getTableColumns, gte, lte, or } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, gt, gte, lte, or } from "drizzle-orm";
 import { db } from "../db";
 import { appointments, halls } from "../db/schema/schema";
 
@@ -239,6 +239,37 @@ export class AppointmentRepository {
 	}
 
 	/**
+	 * Get upcoming appointments within a time window for notifications
+	 */
+	async getUpcomingAppointmentsInWindow(
+		userId: number,
+		windowStart: Date,
+		windowEnd: Date,
+	): Promise<Appointment[]> {
+		const rows = await db
+			.select({
+				...getTableColumns(appointments),
+				hallName: halls.name,
+			})
+			.from(appointments)
+			.leftJoin(halls, eq(appointments.hallId, halls.id))
+			.where(
+				and(
+					eq(appointments.userId, userId),
+					gt(appointments.appointmentDatetime, windowStart),
+					lte(appointments.appointmentDatetime, windowEnd),
+					or(
+						eq(appointments.status, "pending"),
+						eq(appointments.status, "confirmed"),
+					),
+				),
+			)
+			.orderBy(appointments.appointmentDatetime);
+
+		return rows.map(mapToAppointment);
+	}
+
+	/**
 	 * Get appointments by hall (for staff view)
 	 */
 	async getAppointmentsByHall(
@@ -248,7 +279,7 @@ export class AppointmentRepository {
 		const now = new Date();
 
 		let whereClause: ReturnType<typeof and> | undefined;
-		
+
 		// Base condition: match hallId
 		const hallCondition = eq(appointments.hallId, hallId);
 

@@ -62,6 +62,7 @@ export function AppointmentCard({ type, time, location, id }) {
 					class="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
 					title="Cancel"
 					hx-delete={`/appointments/${id}`}
+					hx-confirm="Are you sure you want to cancel this appointment?"
 					hx-swap="none"
 				>
 					<svg
@@ -114,7 +115,10 @@ export function TimerCard({ machine, type, hall, timeLeft, status }) {
 export function PaymentCard({
 	balance,
 	oob = false,
-}: { balance: string; oob?: boolean }) {
+}: {
+	balance: string;
+	oob?: boolean;
+}) {
 	return (
 		<div
 			id="payment-summary"
