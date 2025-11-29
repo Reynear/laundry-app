@@ -10,7 +10,10 @@ const auth = new Hono();
 // Extract the context type from Hono's route handler
 type HonoContext = Parameters<Parameters<typeof auth.get>[0]>[0];
 
-function loginFailed(c: HonoContext, message: string = "Invalid email or password") {
+function loginFailed(
+	c: HonoContext,
+	message: string = "Invalid email or password",
+) {
 	return c.html(
 		<Alert type="error" title="Login Failed" description={message} />,
 	);

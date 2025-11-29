@@ -9,7 +9,7 @@ app.get("/", async (c) => {
 
 	return c.html(
 		<DashboardLayout user={user} currentPath="/settings">
-			<Settings/>
+			<Settings />
 		</DashboardLayout>,
 	);
 });

@@ -294,9 +294,9 @@ describe("Auth API", () => {
 			let insertedPassword = "";
 			mockDb.limit.mockImplementation(() => []); // No existing user
 			mockDb.values.mockImplementation((data) => {
-			insertedPassword = (data as { passwordHash: string }).passwordHash;
-			return mockDb;
-		});
+				insertedPassword = (data as { passwordHash: string }).passwordHash;
+				return mockDb;
+			});
 
 			// Mock the fetch after insert
 			mockDb.limit.mockReturnValueOnce([]).mockReturnValueOnce([
@@ -326,11 +326,11 @@ describe("Auth API", () => {
 
 		it("should register user with optional hallId", async () => {
 			let insertedData: Record<string, unknown> = {};
-		mockDb.limit.mockImplementation(() => []); // No existing user
-		mockDb.values.mockImplementation((data) => {
-			insertedData = data as Record<string, unknown>;
-			return mockDb;
-		});
+			mockDb.limit.mockImplementation(() => []); // No existing user
+			mockDb.values.mockImplementation((data) => {
+				insertedData = data as Record<string, unknown>;
+				return mockDb;
+			});
 
 			mockDb.limit.mockReturnValueOnce([]).mockReturnValueOnce([
 				{

@@ -1,5 +1,5 @@
 type ButtonProps = {
-	children: any;
+	children: string | JSX.Element | JSX.Element[];
 	type?: "button" | "submit" | "reset";
 };
 

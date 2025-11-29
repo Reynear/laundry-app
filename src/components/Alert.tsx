@@ -29,6 +29,8 @@ export function Alert({ type, title, description }: AlertProps) {
 					stroke-width="2"
 					stroke-linecap="round"
 					stroke-linejoin="round"
+					role="img"
+					aria-label="Alert icon"
 				>
 					<circle cx="12" cy="12" r="10" />
 					<line x1="12" x2="12" y1="8" y2="12" />
