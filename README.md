@@ -102,6 +102,12 @@
     ```
     The app will be available at `http://localhost:3000`.
 
+8.  **Start Tailwind CSS:**
+    In a separate terminal, run the Tailwind CLI to watch for changes:
+    ```bash
+    bunx @tailwindcss/cli -i input.css -o output.css --watch
+    ```
+
 ### Scripts
 
 - `bun run dev`: Start the development server.
