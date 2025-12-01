@@ -138,6 +138,7 @@ function Credentials() {
 			<p class="font-semibold text-gray-700">Default Logins:</p>
 			<p>User → user@mymona.uwi.edu / user123</p>
 			<p>Staff → staff@mymona.uwi.edu / staff123</p>
+			<p>Admin → admin@mymona.uwi.edu / admin123</p>
 		</section>
 	);
 }
