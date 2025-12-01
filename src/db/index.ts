@@ -6,7 +6,7 @@ import * as schema from "./schema/schema";
 const connectionString =
 	process.env.DATABASE_URL ||
 	(process.env.DB_HOST
-		? `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`
+		? `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_DATABASE}`
 		: undefined);
 
 if (!connectionString) {
