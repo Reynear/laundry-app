@@ -4,8 +4,5 @@ nixPkgs = ["bun"]
 [phases.install]
 cmds = ["bun install"]
 
-[phases.build]
-cmds = ["bunx drizzle-kit migrate", "bun scripts/seed.ts"]
-
 [start]
-cmd = "bun start"
+cmd = "bunx drizzle-kit migrate && bun scripts/seed.ts && bun start"
