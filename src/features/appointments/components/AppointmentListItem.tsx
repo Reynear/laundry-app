@@ -46,6 +46,10 @@ export function AppointmentListItem({
 		no_show: "No Show",
 	};
 
+	// Check if appointment time has passed (for showing no-show option)
+	const now = new Date();
+	const appointmentHasPassed = appointment.appointmentDatetime <= now;
+
 	return (
 		<div
 			id={`appointment-item-${appointment.id}`}
@@ -138,7 +142,7 @@ export function AppointmentListItem({
 						{formatCurrency(appointment.totalCost)}
 					</span>
 					{/* Staff action buttons - show for confirmed appointments */}
-					{appointment.status === "confirmed" && (
+					{appointment.status === "confirmed" && appointmentHasPassed && (
 						<div class="flex gap-2 mt-1">
 							<button
 								type="button"

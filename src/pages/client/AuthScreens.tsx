@@ -97,7 +97,7 @@ export function RegisterScreen({ halls }: { halls: Hall[] }) {
 				/>
 
 				<Select
-					id="hallOfResidence"
+					id="hallId"
 					label="Hall of Residence"
 					// TODO: Get halls from actual DB
 					options={[

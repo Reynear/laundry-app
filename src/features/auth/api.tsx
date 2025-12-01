@@ -77,9 +77,9 @@ auth.post("/register", async (c) => {
 		const password = formData.get("password") as string;
 		const firstName = formData.get("firstName") as string;
 		const lastName = formData.get("lastName") as string;
-		const hallId = formData.get("hallId")
-			? parseInt(formData.get("hallId") as string, 10)
-			: undefined;
+		const hallIdRaw = formData.get("hallId") as string | null;
+		const hallId = hallIdRaw ? parseInt(hallIdRaw, 10) : undefined;
+		const parsedHallId = hallId && !Number.isNaN(hallId) ? hallId : undefined;
 
 		if (!email || !password) {
 			return c.html(
@@ -110,7 +110,7 @@ auth.post("/register", async (c) => {
 			passwordHash,
 			firstName,
 			lastName,
-			hallId,
+			hallId: parsedHallId,
 			role: "student",
 			walletBalance: "0",
 		});
