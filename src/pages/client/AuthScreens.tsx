@@ -108,17 +108,6 @@ export function RegisterScreen({ halls }: { halls: Hall[] }) {
 					]}
 				/>
 
-				<Select
-					id="notificationMethod"
-					label="Preferred Notification Method"
-					options={[
-						["", "Select notification method"],
-						["push", "Push Notification"],
-						["email", "Email"],
-						["sms", "SMS"],
-					]}
-				/>
-
 				<Button type="submit">Sign up</Button>
 
 				<p class="text-center text-base text-gray-600">
@@ -138,7 +127,7 @@ function Credentials() {
 			<p class="font-semibold text-gray-700">Default Logins:</p>
 			<p>User → user@mymona.uwi.edu / user123</p>
 			<p>Staff → staff@mymona.uwi.edu / staff123</p>
-			<p>Admin → admin@mymona.uwi.edu / admin123</p>
+			<p>Admin → admin@mymona.uwi.edu / staff123</p>
 		</section>
 	);
 }
