@@ -17,6 +17,31 @@ interface MachineCardProps {
 }
 
 export function MachineCard({ machine }: MachineCardProps) {
+    // Debug logging
+    const hasSession = !!machine.session;
+    const sessionStatus = machine.session?.sessionStatus;
+    const machineStatus = machine.status;
+
+    // Show Stop button if session exists and is running
+    // Note: Currently checking isUsersMachine inside the render to prevent accidental stops of others' machines
+    // If staff should stop ANY machine, we need to pass that permission or update isUsersMachine logic
+    const showStopButton = hasSession && sessionStatus !== "completed";
+
+    // Show Start button if:
+    // 1. No session exists OR session is completed
+    // AND
+    // 2. Machine is physically available (not out of service or maintenance)
+    const showStartButton = (!hasSession || sessionStatus === "completed") && machineStatus === "available";
+
+    console.log(`Machine ${machine.id}:`, {
+        hasSession,
+        sessionStatus,
+        machineStatus,
+        showStopButton,
+        showStartButton,
+        isUsersMachine: machine.session?.isUsersMachine
+    });
+
     const getStatusColor = () => {
         switch (machine.status) {
             case "available":
@@ -171,7 +196,8 @@ export function MachineCard({ machine }: MachineCardProps) {
                 {getStatusBadge()}
             </div>
 
-            {machine.session && machine.session.sessionStatus !== "completed" && (
+            {/* Timer and Stop button */}
+            {showStopButton && machine.session && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
 
                     <div class="flex items-center justify-between mb-3">
@@ -188,18 +214,22 @@ export function MachineCard({ machine }: MachineCardProps) {
                         />
                     </div>
 
-                    <button
-                        class="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg"
-                        hx-post={`/timers/${machine.session.id}/stop`}
-                        hx-target="#machine-list"
-                        hx-swap="innerHTML"
-                    >
-                        Stop Machine
-                    </button>
+                    {/* Only show stop button if it's the user's machine */}
+                    {machine.session.isUsersMachine && (
+                        <button
+                            class="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                            hx-post={`/timers/${machine.session.id}/stop`}
+                            hx-target="#machine-list"
+                            hx-swap="innerHTML"
+                        >
+                            Stop Machine
+                        </button>
+                    )}
                 </div>
             )}
 
-            {machine.session && machine.session.sessionStatus === "completed" && (
+            {/* Start button */}
+            {showStartButton && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
                     <button
                         class="w-full px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
@@ -212,7 +242,6 @@ export function MachineCard({ machine }: MachineCardProps) {
                     </button>
                 </div>
             )}
-
 
             {machine.status === "out_of_service" && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
