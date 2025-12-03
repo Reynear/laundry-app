@@ -67,6 +67,19 @@ export const ShiftListItem = ({ shift, isAdmin }: ShiftListItemProps) => {
                     </div>
                 )}
 
+                {isAdmin && (
+                    <button
+                        hx-delete={`/scheduling/${shift.id}`}
+                        hx-target={`#shift-${shift.id}`}
+                        hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to delete this shift?"
+                        className="text-sm text-red-600 hover:underline cursor-pointer ml-2"
+                        title="Delete shift"
+                    >
+                        Delete
+                    </button>
+                )}
+
                 {!isAdmin && shift.status === "pending" && (
                     <button
                         hx-delete={`/scheduling/${shift.id}`}
