@@ -9,7 +9,21 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
                 <h2 className="text-lg font-semibold mb-4">Add A New Shift</h2>
-                <form hx-post="/scheduling" hx-target="#shifts-list" hx-swap="afterbegin" className="flex gap-4 items-end">
+                <form
+                    hx-post="/scheduling"
+                    hx-target="#shifts-list"
+                    hx-swap="afterbegin"
+                    className="flex gap-4 items-end"
+                    onsubmit="
+                        const startTime = this.querySelector('[name=startTime]').value;
+                        const endTime = this.querySelector('[name=endTime]').value;
+                        if (endTime <= startTime) {
+                            alert('End time must be after start time');
+                            return false;
+                        }
+                        return true;
+                    "
+                >
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Date</label>
                         <input
