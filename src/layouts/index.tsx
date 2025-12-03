@@ -322,10 +322,10 @@ function StaffSidebar({ user, currentPath }) {
 		},
 	];
 
-	if (user.role == "admin" || user.role == "manager"){
-		{
-			href: "/scheduling"
-			label: "Admin Scheduling"
+	if (user.role == "admin" || user.role == "manager") {
+		links.push({
+			href: "/scheduling/admin",
+			label: "Admin Scheduling",
 			icon: (
 				<svg
 					className="w-6 h-6"
@@ -342,7 +342,7 @@ function StaffSidebar({ user, currentPath }) {
 					/>
 				</svg>
 			)
-		};
+		});
 	}
 	return (
 		<aside

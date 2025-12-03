@@ -3,12 +3,9 @@ import { format } from "date-fns";
 interface ShiftListItemProps {
     shift: Shift;
     isAdmin?: boolean;
-    onCancel?: (id: number) => void;
-    onApprove?: (id: number) => void;
-    onReject?: (id: number) => void;
 }
 
-export const ShiftListItem = ({ shift, isAdmin, onCancel, onApprove, onReject }: ShiftListItemProps) => {
+export const ShiftListItem = ({ shift, isAdmin }: ShiftListItemProps) => {
     const statusColors = {
         pending: "bg-yellow-100 text-yellow-800",
         approved: "bg-green-100 text-green-800",
@@ -18,7 +15,7 @@ export const ShiftListItem = ({ shift, isAdmin, onCancel, onApprove, onReject }:
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-sm mb-2">
+        <div id={`shift-${shift.id}`} className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-sm mb-2">
             <div>
                 <div className="font-medium">
                     {format(new Date(shift.startTime), "MMM d, yyyy")}
@@ -41,15 +38,19 @@ export const ShiftListItem = ({ shift, isAdmin, onCancel, onApprove, onReject }:
                 {isAdmin && shift.status === "pending" && (
                     <div className="flex gap-1">
                         <button
-                            onClick={() => onApprove?.(shift.id)}
-                            className="p-1 text-green-600 hover:bg-green-50 rounded"
+                            hx-patch={`/scheduling/${shift.id}/approve`}
+                            hx-target={`#shift-${shift.id}`}
+                            hx-swap="outerHTML"
+                            className="p-1 text-green-600 hover:bg-green-50 rounded cursor-pointer"
                             title="Approve"
                         >
                             ✓
                         </button>
                         <button
-                            onClick={() => onReject?.(shift.id)}
-                            className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            hx-patch={`/scheduling/${shift.id}/reject`}
+                            hx-target={`#shift-${shift.id}`}
+                            hx-swap="outerHTML"
+                            className="p-1 text-red-600 hover:bg-red-50 rounded cursor-pointer"
                             title="Reject"
                         >
                             ✕
@@ -59,8 +60,11 @@ export const ShiftListItem = ({ shift, isAdmin, onCancel, onApprove, onReject }:
 
                 {!isAdmin && shift.status === "pending" && (
                     <button
-                        onClick={() => onCancel?.(shift.id)}
-                        className="text-sm text-red-600 hover:underline"
+                        hx-delete={`/scheduling/${shift.id}`}
+                        hx-target={`#shift-${shift.id}`}
+                        hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to cancel this shift request?"
+                        className="text-sm text-red-600 hover:underline cursor-pointer"
                     >
                         Cancel
                     </button>

@@ -2,13 +2,19 @@ import { Hono } from "hono";
 import { shiftRepository } from "../../Repositories/ShiftRepository";
 import { z } from "zod";
 import { validator } from "hono/validator";
+import { DashboardLayout } from "../../layouts";
+import { Scheduling } from "../../pages/staff/Scheduling";
+import { RosterManager } from "./components/RosterManager";
+import { ScheduleViewer } from "./components/ScheduleViewer";
+import { ShiftListItem } from "./components/ShiftListItem";
 
 const app = new Hono();
 
 // Schema for creating a shift
 const createShiftSchema = z.object({
-    startTime: z.string().transform((str) => new Date(str)),
-    endTime: z.string().transform((str) => new Date(str)),
+    date: z.string(),
+    startTime: z.string(),
+    endTime: z.string(),
 });
 
 /**
@@ -17,32 +23,49 @@ const createShiftSchema = z.object({
 // Show staff's own shifts
 app.get("/", async (c) => {
     const user = c.get("user");
+
+    // If admin/manager, redirect to admin view
+    if (user.role === "admin" || user.role === "manager") {
+        return c.redirect("/scheduling/admin");
+    }
+
     const shifts = await shiftRepository.getShiftsByUser(user.id);
-    return c.json(shifts);
+
+    return c.html(
+        <DashboardLayout user={user} currentPath="/scheduling">
+            <div className="max-w-4xl mx-auto">
+                <RosterManager shifts={shifts} />
+            </div>
+        </DashboardLayout>
+    );
 });
 
 // Create new shift request
-app.post("/", validator("json", (value, c) => {
+app.post("/", validator("form", (value, c) => {
     const parsed = createShiftSchema.safeParse(value);
     if (!parsed.success) return c.text("Invalid input", 400);
     return parsed.data;
 }), async (c) => {
     const user = c.get("user");
-    const { startTime, endTime } = c.req.valid("json");
+    const { date, startTime, endTime } = c.req.valid("form");
+
+    const start = new Date(`${date}T${startTime}`);
+    const end = new Date(`${date}T${endTime}`);
 
     // Basic validation: end time > start time
-    if (endTime <= startTime) {
+    if (end <= start) {
         return c.text("End time must be after start time", 400);
     }
 
     const shift = await shiftRepository.createShift({
         userId: user.id,
-        hallId: user.hallId, // Assuming staff belongs to a hall
-        startTime,
-        endTime,
+        hallId: user.hallId,
+        startTime: start,
+        endTime: end,
     });
 
-    return c.json(shift);
+    // Return just the new list item to be prepended
+    return c.html(<ShiftListItem shift={shift} />);
 });
 
 // Cancel a pending shift request
@@ -57,7 +80,7 @@ app.delete("/:id", async (c) => {
     if (shift.status !== "pending") return c.text("Cannot cancel non-pending shift", 400);
 
     await shiftRepository.deleteShift(id);
-    return c.json({ success: true });
+    return c.body(null); // Return empty body to remove the element
 });
 
 /**
@@ -67,7 +90,7 @@ app.delete("/:id", async (c) => {
 app.get("/admin", async (c) => {
     const user = c.get("user");
     if (user.role !== "admin" && user.role !== "manager") {
-        return c.text("Unauthorized", 403);
+        return c.redirect("/scheduling");
     }
 
     const hallId = c.req.query("hallId") ? parseInt(c.req.query("hallId")!) : undefined;
@@ -82,23 +105,25 @@ app.get("/admin", async (c) => {
             date
         });
     } else {
-        // If no hall specified, we can still filter by date/status if needed, 
-        // but for now let's stick to pending if no specific filters, or all if filters exist
         if (status || date) {
-            // This case might need a new generic "getAllShifts" method if we want to search EVERYTHING
-            // For now, let's reuse getAllPendingShifts if status is pending or undefined
             if (!status || status === "pending") {
                 shifts = await shiftRepository.getAllPendingShifts({ date });
             } else {
-                // Fallback or implement getAllShifts(filter)
-                shifts = []; // TODO: Implement generic search if needed
+                // Fallback for now
+                shifts = await shiftRepository.getAllPendingShifts({ date });
             }
         } else {
             shifts = await shiftRepository.getAllPendingShifts();
         }
     }
 
-    return c.json(shifts);
+    return c.html(
+        <DashboardLayout user={user} currentPath="/scheduling">
+            <div className="max-w-4xl mx-auto">
+                <ScheduleViewer shifts={shifts} filter={{ status, hallId, date: dateStr }} />
+            </div>
+        </DashboardLayout>
+    );
 });
 
 // Approve a shift
@@ -108,7 +133,9 @@ app.patch("/:id/approve", async (c) => {
 
     const id = parseInt(c.req.param("id"));
     const shift = await shiftRepository.updateShiftStatus(id, "approved");
-    return c.json(shift);
+
+    if (!shift) return c.text("Error updating shift", 500);
+    return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
 });
 
 // Reject a shift
@@ -118,7 +145,9 @@ app.patch("/:id/reject", async (c) => {
 
     const id = parseInt(c.req.param("id"));
     const shift = await shiftRepository.updateShiftStatus(id, "rejected");
-    return c.json(shift);
+
+    if (!shift) return c.text("Error updating shift", 500);
+    return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
 });
 
 export default app;
