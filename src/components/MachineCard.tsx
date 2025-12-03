@@ -197,6 +197,7 @@ export function MachineCard({ machine }: MachineCardProps) {
             </div>
 
             {/* Timer and Stop button */}
+            {/* Timer and Stop button */}
             {showStopButton && machine.session && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
 
@@ -214,17 +215,15 @@ export function MachineCard({ machine }: MachineCardProps) {
                         />
                     </div>
 
-                    {/* Only show stop button if it's the user's machine */}
-                    {machine.session.isUsersMachine && (
-                        <button
-                            class="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-                            hx-post={`/timers/${machine.session.id}/stop`}
-                            hx-target="#machine-list"
-                            hx-swap="innerHTML"
-                        >
-                            Stop Machine
-                        </button>
-                    )}
+                    {/* Show stop button for all staff users */}
+                    <button
+                        class="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-slate-600 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
+                        hx-post={`/timers/${machine.session.id}/stop`}
+                        hx-target="#machine-list"
+                        hx-swap="innerHTML"
+                    >
+                        Stop Machine
+                    </button>
                 </div>
             )}
 
@@ -232,7 +231,7 @@ export function MachineCard({ machine }: MachineCardProps) {
             {showStartButton && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
                     <button
-                        class="w-full px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+                        class="w-full px-4 py-2 text-sm font-medium text-white bg-slate-600 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
                         hx-post={`/timers/${machine.id}/start`}
                         hx-vals={`{"duration": ${machine.durationMins}}`}
                         hx-target="#machine-list"
