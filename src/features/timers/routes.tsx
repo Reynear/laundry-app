@@ -1,46 +1,57 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import { machineSessionRepository } from "../../Repositories/MachineSessionRepository";
-import { requireStaff } from "../../middleware/auth";
 
-const router = Router();
+const app = new Hono();
 
-router.get("/", requireStaff, async (req, res) => {
-  res.render("staff/MachineTimers");
+// GET /timers/ (page)
+app.get("/", (c) => {
+  // If you use server-side rendering, replace with your renderer.
+  return c.text("Machine Timers page (replace with render)");
 });
 
-router.get("/machines", requireStaff, async (req, res) => {
-  const hallId = req.user.hallId;
+// GET /timers/machines
+app.get("/machines", async (c) => {
+  const user = c.get("user") as any; // set by your auth middleware in index.tsx
+  if (!user) return c.redirect("/login");
 
+  const hallId = user.hallId;
   const machines = await machineSessionRepository.getMachinesWithSessions(
     hallId,
-    // pass current user for isUsersMachine mapping
-    req.user?.id ?? 0,
+    user?.id ?? 0,
   );
 
-  res.render("components/MachineList", { machines });
+  // Replace with c.html/c.render if you have templating wired up.
+  return c.json(machines);
 });
 
-router.post("/:machineId/start", requireStaff, async (req, res) => {
-  const { machineId } = req.params;
-  const { duration } = req.body;
+// POST /timers/:machineId/start
+app.post("/:machineId/start", async (c) => {
+  const user = c.get("user") as any;
+  if (!user) return c.redirect("/login");
+
+  const machineId = Number(c.req.param("machineId"));
+  const body = await c.req.json().catch(() => ({}));
+  const duration = Number(body.duration) || 60;
 
   const startTime = new Date();
   const expectedEndTime = new Date(Date.now() + duration * 60000);
 
   await machineSessionRepository.startSession({
-    machineId: Number(machineId),
+    machineId,
     appointmentId: null,
-    startedByUserId: req.user.id,
+    startedByUserId: user.id,
     startTime,
     expectedEndTime,
   });
 
-  res.redirect("/timers/machines");
+  return c.redirect("/timers/machines");
 });
 
-router.post("/:sessionId/stop", requireStaff, async (req, res) => {
-  await machineSessionRepository.endSession(Number(req.params.sessionId));
-  res.redirect("/timers/machines");
+// POST /timers/:sessionId/stop
+app.post("/:sessionId/stop", async (c) => {
+  const sessionId = Number(c.req.param("sessionId"));
+  await machineSessionRepository.endSession(sessionId);
+  return c.redirect("/timers/machines");
 });
 
-export default router;
+export default app;
