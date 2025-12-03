@@ -177,6 +177,37 @@ export class ShiftRepository {
 		const result = await db.delete(shifts).where(eq(shifts.id, id)).returning();
 		return result.length > 0;
 	}
+
+	// Get shifts for a specific week (for weekly calendar view)
+	async getShiftsForWeek(hallId: number, weekStart: Date): Promise<Shift[]> {
+		const weekEnd = new Date(weekStart);
+		weekEnd.setDate(weekStart.getDate() + 7);
+
+		const result = await db
+			.select({
+				id: shifts.id,
+				userId: shifts.userId,
+				hallId: shifts.hallId,
+				startTime: shifts.startTime,
+				endTime: shifts.endTime,
+				status: shifts.status,
+				staffName: sql<string>`concat(${users.firstName}, ' ', ${users.lastName})`,
+				hallName: halls.name,
+			})
+			.from(shifts)
+			.leftJoin(users, eq(shifts.userId, users.id))
+			.leftJoin(halls, eq(shifts.hallId, halls.id))
+			.where(
+				and(
+					eq(shifts.hallId, hallId),
+					gte(shifts.startTime, weekStart),
+					lte(shifts.startTime, weekEnd)
+				)
+			)
+			.orderBy(shifts.startTime);
+
+		return result as Shift[];
+	}
 }
 
 export const shiftRepository = new ShiftRepository();
