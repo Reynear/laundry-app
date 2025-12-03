@@ -98,6 +98,45 @@ export class ShiftRepository {
 		return result as Shift[];
 	}
 
+	// Get all shifts (for admin view with filters)
+	async getAllShifts(filter?: { status?: ShiftStatus; date?: Date }): Promise<Shift[]> {
+		const conditions = [];
+
+		if (filter?.status && filter.status !== "all" as any) {
+			conditions.push(eq(shifts.status, filter.status));
+		}
+
+		if (filter?.date) {
+			const nextDay = new Date(filter.date);
+			nextDay.setDate(nextDay.getDate() + 1);
+			conditions.push(
+				and(
+					gte(shifts.startTime, filter.date),
+					lte(shifts.startTime, nextDay)
+				)
+			);
+		}
+
+		const result = await db
+			.select({
+				id: shifts.id,
+				userId: shifts.userId,
+				hallId: shifts.hallId,
+				startTime: shifts.startTime,
+				endTime: shifts.endTime,
+				status: shifts.status,
+				staffName: sql<string>`concat(${users.firstName}, ' ', ${users.lastName})`,
+				hallName: halls.name,
+			})
+			.from(shifts)
+			.leftJoin(users, eq(shifts.userId, users.id))
+			.leftJoin(halls, eq(shifts.hallId, halls.id))
+			.where(and(...conditions))
+			.orderBy(desc(shifts.startTime));
+
+		return result as Shift[];
+	}
+
 	// Get single shift
 	async getShiftById(id: number): Promise<Shift | null> {
 		const result = await db
@@ -137,6 +176,37 @@ export class ShiftRepository {
 	async deleteShift(id: number): Promise<boolean> {
 		const result = await db.delete(shifts).where(eq(shifts.id, id)).returning();
 		return result.length > 0;
+	}
+
+	// Get shifts for a specific week (for weekly calendar view)
+	async getShiftsForWeek(hallId: number, weekStart: Date): Promise<Shift[]> {
+		const weekEnd = new Date(weekStart);
+		weekEnd.setDate(weekStart.getDate() + 7);
+
+		const result = await db
+			.select({
+				id: shifts.id,
+				userId: shifts.userId,
+				hallId: shifts.hallId,
+				startTime: shifts.startTime,
+				endTime: shifts.endTime,
+				status: shifts.status,
+				staffName: sql<string>`concat(${users.firstName}, ' ', ${users.lastName})`,
+				hallName: halls.name,
+			})
+			.from(shifts)
+			.leftJoin(users, eq(shifts.userId, users.id))
+			.leftJoin(halls, eq(shifts.hallId, halls.id))
+			.where(
+				and(
+					eq(shifts.hallId, hallId),
+					gte(shifts.startTime, weekStart),
+					lte(shifts.startTime, weekEnd)
+				)
+			)
+			.orderBy(shifts.startTime);
+
+		return result as Shift[];
 	}
 }
 
