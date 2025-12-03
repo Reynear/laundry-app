@@ -77,6 +77,63 @@ app.delete("/:id", async (c) => {
     if (!shift) return c.text("Shift not found", 404);
 
     if (shift.userId !== user.id) return c.text("Unauthorized", 403);
+    if (shift.status !== "pending") return c.text("Cannot cancel non-pending shift", 400);
+
+    await shiftRepository.deleteShift(id);
+    return c.body(null); // Return empty body to remove the element
+});
+
+/**
+ * Admin Routes
+ */
+// Show all pending/approved shifts
+app.get("/admin", async (c) => {
+    const user = c.get("user");
+    if (user.role !== "admin" && user.role !== "manager") {
+        return c.redirect("/scheduling");
+    }
+
+    const hallId = c.req.query("hallId") ? parseInt(c.req.query("hallId")!) : undefined;
+    const status = c.req.query("status") as ShiftStatus | "all" | undefined;
+    const dateStr = c.req.query("date");
+    const date = dateStr ? new Date(dateStr) : undefined;
+
+    // Fetch all halls for the dropdown
+    const { hallRepository } = await import("../../Repositories/HallRepository");
+    const halls = await hallRepository.getAllHalls();
+
+    let shifts;
+    if (hallId) {
+        shifts = await shiftRepository.getShiftsByHall(hallId, {
+            status: status === "all" ? undefined : status,
+            date
+        });
+    } else {
+        if (status || date) {
+            if (!status || status === "pending") {
+                shifts = await shiftRepository.getAllPendingShifts({ date });
+            } else {
+                // Fallback for now
+                shifts = await shiftRepository.getAllPendingShifts({ date });
+            }
+        } else {
+            shifts = await shiftRepository.getAllPendingShifts();
+        }
+    }
+
+    return c.html(
+        <DashboardLayout user={user} currentPath="/scheduling">
+            <div className="max-w-4xl mx-auto">
+                <ScheduleViewer shifts={shifts} filter={{ status, hallId, date: dateStr }} halls={halls} />
+            </div>
+        </DashboardLayout>
+    );
+});
+
+// Approve a shift
+app.patch("/:id/approve", async (c) => {
+    const user = c.get("user");
+    if (user.role !== "admin" && user.role !== "manager") return c.text("Unauthorized", 403);
 
     const id = parseInt(c.req.param("id"));
     const shift = await shiftRepository.updateShiftStatus(id, "approved");
