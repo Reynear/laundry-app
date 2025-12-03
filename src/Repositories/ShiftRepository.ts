@@ -22,48 +22,35 @@ export class ShiftRepository {
 			})
 			.from(shifts)
 			.leftJoin(halls, eq(shifts.hallId, halls.id))
-			.where(and(...conditions))
-			.orderBy(desc(shifts.startTime));
-
-		return result as Shift[];
-	}
-
-	// Get all shifts for a hall (for admin)
-	async getShiftsByHall(hallId: number, filter?: { status?: ShiftStatus; date?: Date }): Promise<Shift[]> {
-		const conditions = [eq(shifts.hallId, hallId)];
-		if (filter?.status && filter.status !== "all" as any) {
-			conditions.push(eq(shifts.status, filter.status));
-		}
-		if (filter?.date) {
-			const nextDay = new Date(filter.date);
-			nextDay.setDate(nextDay.getDate() + 1);
-			conditions.push(
-				and(
-					hallId: data.hallId,
-					startTime: data.startTime,
-					endTime: data.endTime,
-					status: "pending",
+		const nextDay = new Date(filter.date);
+		nextDay.setDate(nextDay.getDate() + 1);
+		conditions.push(
+			and(
+				hallId: data.hallId,
+				startTime: data.startTime,
+				endTime: data.endTime,
+				status: "pending",
 		}).returning();
 
 		return result[0] as Shift;
 	}
 
 	// Admin approves/rejects
-	async updateShiftStatus(id: number, status: ShiftStatus): Promise<Shift | null> {
-		const result = await db
-			.update(shifts)
-			.set({ status })
-			.where(eq(shifts.id, id))
-			.returning();
+	async updateShiftStatus(id: number, status: ShiftStatus): Promise < Shift | null > {
+	const result = await db
+		.update(shifts)
+		.set({ status })
+		.where(eq(shifts.id, id))
+		.returning();
 
-		return result[0] ? (result[0] as Shift) : null;
-	}
+	return result[0] ? (result[0] as Shift) : null;
+}
 
 	// Delete a shift
-	async deleteShift(id: number): Promise<boolean> {
-		const result = await db.delete(shifts).where(eq(shifts.id, id)).returning();
-		return result.length > 0;
-	}
+	async deleteShift(id: number): Promise < boolean > {
+	const result = await db.delete(shifts).where(eq(shifts.id, id)).returning();
+	return result.length > 0;
+}
 }
 
 export const shiftRepository = new ShiftRepository();
