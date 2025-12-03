@@ -7,9 +7,10 @@ interface ScheduleViewerProps {
         hallId?: number;
         date?: string;
     };
+    halls: Hall[];
 }
 
-export const ScheduleViewer = ({ shifts, filter }: ScheduleViewerProps) => {
+export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) => {
     return (
         <div className="space-y-6">
             <form action="/scheduling/admin" method="get" className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-lg">
@@ -33,13 +34,17 @@ export const ScheduleViewer = ({ shifts, filter }: ScheduleViewerProps) => {
                         className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
 
-                    <input
-                        type="number"
+                    <select
                         name="hallId"
-                        placeholder="Hall ID"
-                        value={filter.hallId || ""}
-                        className="w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
+                        className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                        <option value="">All Halls</option>
+                        {halls.map(hall => (
+                            <option key={hall.id} value={hall.id} selected={filter.hallId === hall.id}>
+                                {hall.name}
+                            </option>
+                        ))}
+                    </select>
 
                     <button type="submit" className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300 text-sm">Filter</button>
                 </div>
