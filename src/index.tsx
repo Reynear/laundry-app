@@ -80,7 +80,7 @@ app.get("/", async (c) => {
 	);
 	if (sessionId) {
 		const user = await userRepository.getUserById(parseInt(sessionId, 10));
-		if (user && user.role === "staff") {
+		if (user && (user.role === "staff" || user.role === "admin" || user.role === "manager")) {
 			return c.redirect("/appointments");
 		}
 		return c.redirect("/dashboard");

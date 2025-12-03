@@ -17,7 +17,7 @@ dashboard.get("/", async (c) => {
 		return c.redirect("/login");
 	}
 
-	if (user.role === "staff") {
+	if (user.role === "staff" || user.role === "admin" || user.role === "manager") {
 		return c.redirect("/appointments");
 	}
 
