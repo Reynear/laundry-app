@@ -11,6 +11,7 @@ import notifications from "./features/notifications/routes";
 import payments from "./features/payments/routes";
 import settings from "./features/settings/routes";
 import { userRepository } from "./Repositories/UserRepository";
+import scheduling from "./features/scheduling/routes";
 
 const app = new Hono();
 
@@ -59,6 +60,7 @@ app.use("/notices/*", authMiddleware);
 app.use("/payments/*", authMiddleware);
 app.use("/settings/*", authMiddleware);
 app.use("/api/notifications/*", authMiddleware);
+app.use("/scheduling/*", authMiddleware);
 
 app.route("/dashboard", dashboard);
 app.route("/appointments", appointments);
@@ -66,6 +68,7 @@ app.route("/notices", notices);
 app.route("/payments", payments);
 app.route("/settings", settings);
 app.route("/api/notifications", notifications);
+app.route("/scheduling", scheduling);
 
 app.get("/", async (c) => {
 	const sessionId = await getSignedCookie(

@@ -82,6 +82,18 @@ type Notice = {
 	expiresAt?: Date;
 };
 
+type ShiftStatus = "pending"|"approved"|"rejected"|"completed"|"absent";
+interface Shift{
+	id: number;
+	userId: number;
+	hallId: number;
+	startTime: Date;
+	endTime: Date;
+	status: ShiftStatus;
+	staffName?: string;
+	hallName?: string;
+}
+
 // Extend Hono's context to include custom variables set by middleware
 declare module "hono" {
 	interface ContextVariableMap {

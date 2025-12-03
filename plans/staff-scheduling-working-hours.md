@@ -181,24 +181,24 @@ src/
 ## Tasks Breakdown
 
 ### Database & Types
-- [ ] Update `shiftStatusEnum` in schema.ts to add pending/approved/rejected
-- [ ] Run database migration (`npm run db:push`)
-- [ ] Add `ShiftStatus` type to types.d.ts
-- [ ] Add `Shift` interface to types.d.ts
+- [ ] Update `shiftStatusEnum` in schema.ts to add pending/approved/rejected //DONE
+- [ ] Run database migration (`npm run db:push`) //getting an error
+- [ ] Add `ShiftStatus` type to types.d.ts //DONE
+- [ ] Add `Shift` interface to types.d.ts //DONE
 
 ### Repository
-- [ ] Create `ShiftRepository.ts` with all methods
-- [ ] Export from `Repositories/index.ts`
+- [ ] Create `ShiftRepository.ts` with all methods //created but errors 
+- [ ] Export from `Repositories/index.ts` // DONE
 
 ### Routes
-- [ ] Create `src/features/scheduling/routes.tsx`
+- [ ] Create `src/features/scheduling/routes.tsx`//DONE
 - [ ] Implement GET /scheduling (staff view)
 - [ ] Implement POST /scheduling (create shift)
 - [ ] Implement DELETE /scheduling/:id (cancel shift)
 - [ ] Implement GET /scheduling/admin (admin view)
 - [ ] Implement PATCH /scheduling/:id/approve
 - [ ] Implement PATCH /scheduling/:id/reject
-- [ ] Register routes in index.tsx
+- [ ] Register routes in index.tsx //DONE
 
 ### UI Components
 - [ ] Create `ShiftListItem.tsx` component

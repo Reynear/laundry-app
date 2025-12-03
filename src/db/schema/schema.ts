@@ -41,7 +41,9 @@ export const sessionStatusEnum = pgEnum("session_status", [
 ]);
 export const noticeTypeEnum = pgEnum("notice_type", ["alert", "info"]);
 export const shiftStatusEnum = pgEnum("shift_status", [
-	"scheduled",
+	"pending",
+	"approved",
+	"rejected",
 	"completed",
 	"absent",
 ]);
@@ -133,7 +135,7 @@ export const shifts = pgTable("shifts", {
 	hallId: integer("hall_id").notNull(), // FK added in relations
 	startTime: timestamp("start_time").notNull(),
 	endTime: timestamp("end_time").notNull(),
-	status: shiftStatusEnum("status").default("scheduled"),
+	status: shiftStatusEnum("status").default("pending"),
 });
 
 // Payments
