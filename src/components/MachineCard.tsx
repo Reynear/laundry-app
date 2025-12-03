@@ -2,15 +2,15 @@ interface MachineCardProps {
     machine: {
         id: number;
         type: "washer" | "dryer";
-        status: "available" | "in_use" | "out_of_service";
+        status: "available" | "in_use" | "out_of_service" | "maintenance";
         durationMins: number;
         session?: {
             id: number;
-            startTime: string;
-            expectedEndTime: string;
+            startTime: string | Date;
+            expectedEndTime: string | Date;
             sessionStatus: string;
             isUsersMachine: boolean;
-            hallName: string;
+            hallName?: string;
             startedByUserId: number;
         } | null;
     };
@@ -25,6 +25,8 @@ export function MachineCard({ machine }: MachineCardProps) {
                 return "bg-blue-50 border-blue-200";
             case "out_of_service":
                 return "bg-red-50 border-red-200";
+            case "maintenance":
+                return "bg-yellow-50 border-yellow-200";
             default:
                 return "bg-slate-50 border-slate-200";
         }
@@ -71,6 +73,19 @@ export function MachineCard({ machine }: MachineCardProps) {
                         Out of Service
                     </span>
                 );
+            case "maintenance":
+                return (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <svg
+                            class="w-2 h-2 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 8 8"
+                        >
+                            <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        Maintenance
+                    </span>
+                );
         }
     };
 
@@ -113,7 +128,9 @@ export function MachineCard({ machine }: MachineCardProps) {
     const formatTimeRemaining = () => {
         if (!machine.session) return null;
 
-        const endTime = new Date(machine.session.expectedEndTime).getTime();
+        const endTime = machine.session.expectedEndTime instanceof Date
+            ? machine.session.expectedEndTime.getTime()
+            : new Date(machine.session.expectedEndTime).getTime();
         const now = Date.now();
         const remaining = Math.max(0, endTime - now);
 
@@ -125,8 +142,12 @@ export function MachineCard({ machine }: MachineCardProps) {
 
     const getProgress = () => {
         if (!machine.session) return 0;
-        const start = new Date(machine.session.startTime).getTime();
-        const end = new Date(machine.session.expectedEndTime).getTime();
+        const start = machine.session.startTime instanceof Date
+            ? machine.session.startTime.getTime()
+            : new Date(machine.session.startTime).getTime();
+        const end = machine.session.expectedEndTime instanceof Date
+            ? machine.session.expectedEndTime.getTime()
+            : new Date(machine.session.expectedEndTime).getTime();
         const now = Date.now();
         return Math.min(100, Math.max(0, ((now - start) / (end - start)) * 100));
     };
@@ -150,8 +171,9 @@ export function MachineCard({ machine }: MachineCardProps) {
                 {getStatusBadge()}
             </div>
 
-            {machine.status === "in_use" && machine.session && (
+            {machine.session && machine.session.sessionStatus !== "completed" && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
+
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-sm font-medium text-slate-700">Time Remaining</span>
                         <span class="text-2xl font-bold text-blue-600 tabular-nums timer-pulse">
@@ -166,25 +188,18 @@ export function MachineCard({ machine }: MachineCardProps) {
                         />
                     </div>
 
-                    <div class="flex items-center justify-between text-xs text-slate-500">
-                        <span>Started: {new Date(machine.session.startTime).toLocaleTimeString()}</span>
-                        <span>Ends: {new Date(machine.session.expectedEndTime).toLocaleTimeString()}</span>
-                    </div>
-
-                    {machine.session.isUsersMachine && (
-                        <button
-                            class="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-                            hx-post={`/timers/${machine.session.id}/stop`}
-                            hx-target="#machine-list"
-                            hx-swap="innerHTML"
-                        >
-                            Stop Machine
-                        </button>
-                    )}
+                    <button
+                        class="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg"
+                        hx-post={`/timers/${machine.session.id}/stop`}
+                        hx-target="#machine-list"
+                        hx-swap="innerHTML"
+                    >
+                        Stop Machine
+                    </button>
                 </div>
             )}
 
-            {machine.status === "available" && (
+            {machine.session && machine.session.sessionStatus === "completed" && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
                     <button
                         class="w-full px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
@@ -198,10 +213,19 @@ export function MachineCard({ machine }: MachineCardProps) {
                 </div>
             )}
 
+
             {machine.status === "out_of_service" && (
                 <div class="mt-4 pt-4 border-t border-slate-200">
                     <p class="text-sm text-red-600 font-medium">
                         ⚠️ This machine is currently out of service
+                    </p>
+                </div>
+            )}
+
+            {machine.status === "maintenance" && (
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <p class="text-sm text-yellow-600 font-medium">
+                        🔧 This machine is under maintenance
                     </p>
                 </div>
             )}
