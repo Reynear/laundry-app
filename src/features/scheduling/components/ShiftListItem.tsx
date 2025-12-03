@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 interface ShiftListItemProps {
     shift: Shift;
     isAdmin?: boolean;
@@ -14,14 +12,25 @@ export const ShiftListItem = ({ shift, isAdmin }: ShiftListItemProps) => {
         absent: "bg-red-200 text-red-900",
     };
 
+    const formatDate = (date: Date) => {
+        return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+    };
+
+    const formatTime = (date: Date) => {
+        return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(date);
+    };
+
+    const start = new Date(shift.startTime);
+    const end = new Date(shift.endTime);
+
     return (
         <div id={`shift-${shift.id}`} className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-sm mb-2">
             <div>
                 <div className="font-medium">
-                    {format(new Date(shift.startTime), "MMM d, yyyy")}
+                    {formatDate(start)}
                 </div>
                 <div className="text-sm text-gray-600">
-                    {format(new Date(shift.startTime), "h:mm a")} - {format(new Date(shift.endTime), "h:mm a")}
+                    {formatTime(start)} - {formatTime(end)}
                 </div>
                 {isAdmin && shift.staffName && (
                     <div className="text-sm text-blue-600 font-medium">
