@@ -12,6 +12,7 @@ import payments from "./features/payments/routes";
 import settings from "./features/settings/routes";
 import { userRepository } from "./Repositories/UserRepository";
 import scheduling from "./features/scheduling/routes";
+import routes from "./features/timers/routes";
 
 const app = new Hono();
 
@@ -61,7 +62,8 @@ app.use("/payments/*", authMiddleware);
 app.use("/settings/*", authMiddleware);
 app.use("/api/notifications/*", authMiddleware);
 app.use("/scheduling/*", authMiddleware);
-
+app.use("/timers/*", authMiddleware);
+app.route("/timers", routes);
 app.route("/dashboard", dashboard);
 app.route("/appointments", appointments);
 app.route("/notices", notices);
