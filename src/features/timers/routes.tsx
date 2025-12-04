@@ -11,10 +11,37 @@ app.get("/", async (c) => {
   const user = c.get("user") as any;
   if (!user) return c.redirect("/login");
 
-  const hall = await hallRepository.getHallById(user.hallId);
+  // Get all halls for admin hall selector
+  const allHalls = await hallRepository.getAllHalls();
+
+  // Determine which hall to show:
+  // 1. For admins: allow switching halls via query param
+  // 2. For staff/manager: always use their assigned hallId
+  const queryHallId = c.req.query("hallId");
+  const hallId = user.role === "admin" && queryHallId 
+    ? Number(queryHallId) 
+    : user.hallId;
+
+  // Admin users without a hallId and no query param should see hall selector
+  if (!hallId) {
+    // For admins only, show the first hall by default
+    if (user.role === "admin") {
+      if (allHalls.length > 0) {
+        // Redirect to first hall
+        return c.redirect(`/timers?hallId=${allHalls[0].id}`);
+      }
+      return c.text("No halls configured", 404);
+    }
+    return c.text("Hall not assigned to user", 404);
+  }
+
+  const hall = await hallRepository.getHallById(hallId);
   if (!hall) return c.text("Hall not found", 404);
 
-  return c.html(<MachineTimers user={user} hall={hall} />);
+  // Only admins can view all halls and switch between them
+  const isAdmin = user.role === "admin";
+
+  return c.html(<MachineTimers user={user} hall={hall} allHalls={isAdmin ? allHalls : undefined} />);
 });
 
 // GET /timers/machines
@@ -22,7 +49,20 @@ app.get("/machines", async (c) => {
   const user = c.get("user") as any; // set by your auth middleware in index.tsx
   if (!user) return c.redirect("/login");
 
-  const hallId = user.hallId;
+  // Only admins can switch halls via query param; others use their assigned hall
+  const queryHallId = c.req.query("hallId");
+  const hallId = user.role === "admin" && queryHallId 
+    ? Number(queryHallId) 
+    : user.hallId;
+
+  if (!hallId) {
+    return c.html(
+      <div class="col-span-full p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <p class="text-yellow-800 font-medium">No hall selected. Please select a hall.</p>
+      </div>
+    );
+  }
+
   const machines = await machineSessionRepository.getMachinesWithSessions(
     hallId,
     user?.id ?? 0,
@@ -87,7 +127,11 @@ app.post("/:machineId/start", async (c) => {
   }
 
   // Fetch updated machine list and return HTML for HTMX
-  const hallId = user.hallId;
+  // Get hallId from the machine we just started
+  const machineRepo = await import("../../Repositories/MachineRepository");
+  const machine = await machineRepo.machineRepository.getMachineById(machineId);
+  const hallId = machine?.hallId || user.hallId;
+
   const machines = await machineSessionRepository.getMachinesWithSessions(
     hallId,
     user?.id ?? 0,
@@ -140,7 +184,18 @@ app.post("/:sessionId/stop", async (c) => {
   }
 
   // Fetch updated machine list and return HTML for HTMX
-  const hallId = user.hallId;
+  // Get hallId from session to properly refresh the list
+  const session = await machineSessionRepository.getSessionById(sessionId);
+  const hallId = session?.hallId || user.hallId;
+
+  if (!hallId) {
+    return c.html(
+      <div class="col-span-full p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <p class="text-yellow-800 font-medium">No hall selected. Please refresh the page.</p>
+      </div>
+    );
+  }
+
   const machines = await machineSessionRepository.getMachinesWithSessions(
     hallId,
     user?.id ?? 0,

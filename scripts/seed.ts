@@ -75,6 +75,14 @@ const USERS_DATA = [
 		hallIndex: 0, // Chancellor Hall
 	},
 	{
+		email: "manager@mymona.uwi.edu",
+		firstName: "Manager",
+		lastName: "User",
+		role: "manager" as const,
+		walletBalance: "0.00",
+		hallIndex: 0, // Chancellor Hall
+	},
+	{
 		email: "admin@mymona.uwi.edu",
 		firstName: "Admin",
 		lastName: "User",
@@ -173,9 +181,10 @@ async function seed() {
 		// Find specific users for later use
 		const studentUser = insertedUsers.find((u) => u.role === "student");
 		const staffUser = insertedUsers.find((u) => u.role === "staff");
+		const managerUser = insertedUsers.find((u) => u.role === "manager");
 		const adminUser = insertedUsers.find((u) => u.role === "admin");
 
-		if (!studentUser || !staffUser || !adminUser) {
+		if (!studentUser || !staffUser || !managerUser || !adminUser) {
 			throw new Error("Failed to find required users after insertion");
 		}
 
@@ -365,6 +374,7 @@ Summary:
 Test Credentials:
   • Student: user@mymona.uwi.edu / user123
   • Staff:   staff@mymona.uwi.edu / staff123
+  • Manager: manager@mymona.uwi.edu / staff123
   • Admin:   admin@mymona.uwi.edu / staff123
 `);
 	} catch (error) {

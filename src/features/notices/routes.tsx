@@ -10,10 +10,20 @@ const app = new Hono();
 app.get("/", async (c) => {
 	const user = c.get("user") as User;
 
-	if (user.role === "staff") {
-		// Staff sees notices for their hall (exclude global notices)
+	if (user.role === "staff" || user.role === "manager") {
+		// Staff/Manager sees notices for their hall (exclude global notices)
 		const notices = await noticeRepository.getActiveNotices(user.hallId, false);
-		return c.html(<StaffNotices user={user} notices={notices} />);
+		const halls: Hall[] = []; // Staff/Manager doesn't need hall selector
+		return c.html(<StaffNotices user={user} notices={notices} halls={halls} />);
+	}
+
+	if (user.role === "admin") {
+		// Admin sees all notices with ability to filter and manage
+		const hallFilter = c.req.query("hallId");
+		const hallId = hallFilter ? Number(hallFilter) : undefined;
+		const notices = await noticeRepository.getActiveNotices(hallId);
+		const halls = await hallRepository.getAllHalls();
+		return c.html(<StaffNotices user={user} notices={notices} halls={halls} selectedHallId={hallId} />);
 	}
 
 	// Student logic
@@ -42,9 +52,9 @@ app.post("/", async (c) => {
 	const content = String(body.content);
 	const priority = String(body.priority); // "low" | "medium" | "high" | "urgent"
 
-	// For staff, force hallId to their hall. For admins (if any), allow selection.
+	// For staff/manager, force hallId to their hall. For admins, allow selection.
 	const hallId =
-		user.role === "staff"
+		user.role === "staff" || user.role === "manager"
 			? user.hallId
 			: body.hallId
 				? Number(body.hallId)
@@ -81,8 +91,11 @@ app.get("/:id/edit", async (c) => {
 		return c.text("Notice not found", 404);
 	}
 
-	// Check permission
-	if (user.role === "staff" && notice.hallId !== user.hallId) {
+	// Check permission - admins can edit any notice, staff/manager only their hall's
+	if ((user.role === "staff" || user.role === "manager") && notice.hallId !== user.hallId) {
+		return c.text("Unauthorized", 403);
+	}
+	if (user.role !== "admin" && user.role !== "staff" && user.role !== "manager") {
 		return c.text("Unauthorized", 403);
 	}
 
@@ -212,7 +225,11 @@ app.post("/:id", async (c) => {
 	const notice = await noticeRepository.getNoticeById(id);
 	if (!notice) return c.text("Notice not found", 404);
 
-	if (user.role === "staff" && notice.hallId !== user.hallId) {
+	// Check permission - admins can update any notice, staff/manager only their hall's
+	if ((user.role === "staff" || user.role === "manager") && notice.hallId !== user.hallId) {
+		return c.text("Unauthorized", 403);
+	}
+	if (user.role !== "admin" && user.role !== "staff" && user.role !== "manager") {
 		return c.text("Unauthorized", 403);
 	}
 
@@ -238,7 +255,11 @@ app.delete("/:id", async (c) => {
 	const notice = await noticeRepository.getNoticeById(id);
 	if (!notice) return c.body(null, 404);
 
-	if (user.role === "staff" && notice.hallId !== user.hallId) {
+	// Check permission - admins can delete any notice, staff/manager only their hall's
+	if ((user.role === "staff" || user.role === "manager") && notice.hallId !== user.hallId) {
+		return c.text("Unauthorized", 403);
+	}
+	if (user.role !== "admin" && user.role !== "staff" && user.role !== "manager") {
 		return c.text("Unauthorized", 403);
 	}
 

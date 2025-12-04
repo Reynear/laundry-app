@@ -23,7 +23,7 @@ import { formatCurrency } from "./utils";
 
 const app = new Hono();
 
-// GET /appointments - Show appointments list (for staff)
+// GET /appointments - Show appointments list (for staff/manager)
 app.get("/", async (c) => {
 	const user = c.get("user") as User;
 
@@ -31,7 +31,8 @@ app.get("/", async (c) => {
 	const filter =
 		(c.req.query("filter") as "upcoming" | "past" | "all") || "upcoming";
 
-	if (user.role === "staff") {
+	// Staff and managers see only their hall's appointments
+	if (user.role === "staff" || user.role === "manager") {
 		const appointments = await appointmentRepository.getAppointmentsByHall(
 			user.hallId,
 			filter,
@@ -45,6 +46,7 @@ app.get("/", async (c) => {
 		);
 	}
 
+	// Admins see all appointments
 	const appointments = await appointmentRepository.getAllAppointments(filter);
 
 	return c.html(

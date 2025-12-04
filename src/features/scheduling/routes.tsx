@@ -26,6 +26,11 @@ app.get("/", async (c) => {
         return c.redirect("/scheduling/admin");
     }
 
+    //If the person is a manager then they will see shifts for their hall
+    if (user.role === "manager") {
+        return c.redirect("/scheduling/manager");
+    }
+
     const shifts = await shiftRepository.getShiftsByUser(user.id);
 
     return c.html(
@@ -148,6 +153,45 @@ app.patch("/:id/reject", async (c) => {
 
     if (!shift) return c.text("Error while updating shift", 500);
     return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
+});
+
+//Routes for the managers
+// Showing shifts for the manager's hall
+app.get("/manager", async (c) => {
+    const user = c.get("user");
+    if (user.role !== "manager") {
+        return c.redirect("/scheduling");
+    }
+
+    if (!user.hallId) {
+        return c.text("Manager not assigned to a hall", 400);
+    }
+
+    const status = c.req.query("status") as any | "all" | undefined;
+    const dateStr = c.req.query("date");
+    const date = dateStr ? new Date(dateStr) : undefined;
+
+    //Get hall info for display
+    const { hallRepository } = await import("../../Repositories/HallRepository");
+    const hall = await hallRepository.getHallById(user.hallId);
+
+    const shifts = await shiftRepository.getShiftsByHall(user.hallId, {
+        status: status === "all" ? undefined : status,
+        date
+    });
+
+    return c.html(
+        <DashboardLayout user={user} currentPath="/scheduling">
+            <div className="max-w-4xl mx-auto">
+                <ScheduleViewer 
+                    shifts={shifts} 
+                    filter={{ status, hallId: user.hallId, date: dateStr }} 
+                    halls={hall ? [hall] : []} 
+                    isManager={true}
+                />
+            </div>
+        </DashboardLayout>
+    );
 });
 
 export default app;

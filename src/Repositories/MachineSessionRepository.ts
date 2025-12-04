@@ -169,6 +169,25 @@ class MachineSessionRepository {
 	}
 
 	/**
+	 * Get a session by ID with hall info
+	 */
+	async getSessionById(
+		sessionId: number,
+	): Promise<{ id: number; hallId: number } | null> {
+		const rows = await db
+			.select({
+				id: machineSessions.id,
+				hallId: machines.hallId,
+			})
+			.from(machineSessions)
+			.innerJoin(machines, eq(machineSessions.machineId, machines.id))
+			.where(eq(machineSessions.id, sessionId));
+
+		if (rows.length === 0) return null;
+		return rows[0];
+	}
+
+	/**
 	 * End a session
 	 */
 	async endSession(sessionId: number): Promise<void> {
@@ -180,5 +199,4 @@ class MachineSessionRepository {
 }
 
 export const machineSessionRepository = new MachineSessionRepository();
-
 
