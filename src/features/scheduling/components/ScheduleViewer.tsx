@@ -6,10 +6,12 @@ interface ScheduleViewerProps {
     filter: {
         status?: string; hallId?: number; date?: string;
     };
-        halls: Hall[];
+    halls: Hall[];
+    isManager?: boolean;
 }
-export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) => {
+export const ScheduleViewer = ({ shifts, filter, halls, isManager = false }: ScheduleViewerProps) => {
     const currentView = filter.status ==="approved" ?"calendar":"list";
+    const formAction = isManager ? "/scheduling/manager" : "/scheduling/admin";
 
     // In order to show the weekly schedule with the approved shifts
     const getWeekStart = () => {
@@ -34,11 +36,13 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
         return new Date(b.startTime).getTime()-new Date(a.startTime).getTime();
     });
     
-    //Layout and information for the Admin Scheduling page
+    //Layout and information for the Admin/Manager Scheduling page
     return (
         <div className="space-y-6">
-            <form action="/scheduling/admin" method="get" className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-lg">
-                <h2 className="text-lg font-semibold">Shift Requests</h2>
+            <form action={formAction} method="get" className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-lg">
+                <h2 className="text-lg font-semibold">
+                    {isManager ? `Shift Requests - ${halls[0]?.name || "Your Hall"}` : "Shift Requests"}
+                </h2>
 
                 <div className="flex gap-2">
                     <select
@@ -57,18 +61,20 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
                         value={filter.date || ""}
                         className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
-                    <select
-                        name="hallId"
-                        value={filter.hallId || ""}
-                        className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    >
-                        <option value="">All Halls</option>
-                        {halls.map(hall => (
-                            <option key={hall.id} value={hall.id}>
-                                {hall.name}
-                            </option>
-                        ))}
-                    </select>
+                    {!isManager && (
+                        <select
+                            name="hallId"
+                            value={filter.hallId || ""}
+                            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                            <option value="">All Halls</option>
+                            {halls.map(hall => (
+                                <option key={hall.id} value={hall.id}>
+                                    {hall.name}
+                                </option>
+                            ))}
+                        </select>
+                    )}
 
                     <button type="submit" className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm">Filter</button>
                 </div>
