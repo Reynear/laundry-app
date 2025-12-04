@@ -15,15 +15,17 @@ app.get("/", async (c) => {
   const allHalls = await hallRepository.getAllHalls();
 
   // Determine which hall to show:
-  // 1. If hallId is in query params, use that (for admin switching halls)
-  // 2. Otherwise use user's assigned hallId
+  // 1. For admins: allow switching halls via query param
+  // 2. For staff/manager: always use their assigned hallId
   const queryHallId = c.req.query("hallId");
-  const hallId = queryHallId ? Number(queryHallId) : user.hallId;
+  const hallId = user.role === "admin" && queryHallId 
+    ? Number(queryHallId) 
+    : user.hallId;
 
   // Admin users without a hallId and no query param should see hall selector
   if (!hallId) {
-    // For admins, show the first hall by default or show a hall selector
-    if (user.role === "admin" || user.role === "manager") {
+    // For admins only, show the first hall by default
+    if (user.role === "admin") {
       if (allHalls.length > 0) {
         // Redirect to first hall
         return c.redirect(`/timers?hallId=${allHalls[0].id}`);
@@ -36,8 +38,8 @@ app.get("/", async (c) => {
   const hall = await hallRepository.getHallById(hallId);
   if (!hall) return c.text("Hall not found", 404);
 
-  // Check if user is admin/manager (can view all halls)
-  const isAdmin = user.role === "admin" || user.role === "manager";
+  // Only admins can view all halls and switch between them
+  const isAdmin = user.role === "admin";
 
   return c.html(<MachineTimers user={user} hall={hall} allHalls={isAdmin ? allHalls : undefined} />);
 });
@@ -47,9 +49,11 @@ app.get("/machines", async (c) => {
   const user = c.get("user") as any; // set by your auth middleware in index.tsx
   if (!user) return c.redirect("/login");
 
-  // Support hallId from query param for admins
+  // Only admins can switch halls via query param; others use their assigned hall
   const queryHallId = c.req.query("hallId");
-  const hallId = queryHallId ? Number(queryHallId) : user.hallId;
+  const hallId = user.role === "admin" && queryHallId 
+    ? Number(queryHallId) 
+    : user.hallId;
 
   if (!hallId) {
     return c.html(
