@@ -72,7 +72,7 @@ export const ShiftListItem = ({ shift, isAdmin }: ShiftListItemProps) => {
                         hx-delete={`/scheduling/${shift.id}`}
                         hx-target={`#shift-${shift.id}`}
                         hx-swap="outerHTML"
-                        hx-confirm="Are you sure you want to delete this shift?"
+                        hx-confirm="Are you sure you want to delete this shift?" //verifying
                         className="text-sm text-red-600 hover:underline cursor-pointer ml-2"
                         title="Delete shift"
                     >
@@ -85,7 +85,7 @@ export const ShiftListItem = ({ shift, isAdmin }: ShiftListItemProps) => {
                         hx-delete={`/scheduling/${shift.id}`}
                         hx-target={`#shift-${shift.id}`}
                         hx-swap="outerHTML"
-                        hx-confirm="Are you sure you want to cancel this shift request?"
+                        hx-confirm="Are you sure you want to cancel this shift request?"//verifying
                         className="text-sm text-red-600 hover:underline cursor-pointer"
                     >
                         Cancel

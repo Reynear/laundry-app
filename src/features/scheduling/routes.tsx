@@ -3,29 +3,26 @@ import { shiftRepository } from "../../Repositories/ShiftRepository";
 import { z } from "zod";
 import { validator } from "hono/validator";
 import { DashboardLayout } from "../../layouts";
-import { Scheduling } from "../../pages/staff/Scheduling";
 import { RosterManager } from "./components/RosterManager";
 import { ScheduleViewer } from "./components/ScheduleViewer";
 import { ShiftListItem } from "./components/ShiftListItem";
 
 const app = new Hono();
 
-// Schema for creating a shift
+//Creating a shcema for the shifts
 const createShiftSchema = z.object({
     date: z.string(),
     startTime: z.string(),
     endTime: z.string(),
 });
 
-/**
- * Staff Routes
- */
-// Show staff's own shifts
+//Staff Routes
+// Shows the staff member's own shifts
 app.get("/", async (c) => {
     const user = c.get("user");
 
-    // If admin/manager, redirect to admin view
-    if (user.role === "admin" || user.role === "manager") {
+    //If the person is an admin then they will have access to seeing the admin scheduling page instead of the regular page
+    if (user.role === "admin") {
         return c.redirect("/scheduling/admin");
     }
 
@@ -40,7 +37,7 @@ app.get("/", async (c) => {
     );
 });
 
-// Create new shift request
+//In order to create a new shift request
 app.post("/", validator("form", (value, c) => {
     const parsed = createShiftSchema.safeParse(value);
     if (!parsed.success) return c.text("Invalid input", 400);
@@ -53,16 +50,17 @@ app.post("/", validator("form", (value, c) => {
     const end = new Date(`${date}T${endTime}`);
     const now = new Date();
 
-    // Validation: cannot create shifts in the past
+    //Making sure one cannot create shifts in the past 
     if (start < now) {
-        return c.text("Cannot request shifts in the past", 400);
+        return c.text("Shifts cannot be in the past", 400);
     }
 
-    // Basic validation: end time > start time
+    //Making sure end time is after start time
     if (end <= start) {
-        return c.text("End time must be after start time", 400);
+        return c.text("End time has to be after start time", 400);
     }
 
+    //Creating the shift
     const shift = await shiftRepository.createShift({
         userId: user.id,
         hallId: user.hallId,
@@ -70,11 +68,11 @@ app.post("/", validator("form", (value, c) => {
         endTime: end,
     });
 
-    // Return just the new list item to be prepended
+
     return c.html(<ShiftListItem shift={shift} />);
 });
 
-// Cancel/Delete a shift request
+//For a staff member to cancel a pending shift request
 app.delete("/:id", async (c) => {
     const user = c.get("user");
     const id = parseInt(c.req.param("id"));
@@ -82,35 +80,26 @@ app.delete("/:id", async (c) => {
     const shift = await shiftRepository.getShiftById(id);
     if (!shift) return c.text("Shift not found", 404);
 
-    // Admins and managers can delete any shift
-    const isAdmin = user.role === "admin" || user.role === "manager";
-
-    if (!isAdmin) {
-        // Staff can only delete their own pending shifts
-        if (shift.userId !== user.id) return c.text("Unauthorized", 403);
-        if (shift.status !== "pending") return c.text("Cannot cancel non-pending shift", 400);
-    }
-
+   
+    //Admin deleting shifts
     await shiftRepository.deleteShift(id);
-    return c.body(null); // Return empty body to remove the element
+    return c.body(null, 200);
 });
 
-/**
- * Admin Routes
- */
-// Show all pending/approved shifts
+//Routes for the admins
+// Showing all pending shifts
 app.get("/admin", async (c) => {
     const user = c.get("user");
-    if (user.role !== "admin" && user.role !== "manager") {
+    if (user.role !== "admin") {
         return c.redirect("/scheduling");
     }
 
     const hallId = c.req.query("hallId") ? parseInt(c.req.query("hallId")!) : undefined;
-    const status = c.req.query("status") as ShiftStatus | "all" | undefined;
+    const status = c.req.query("status") as any | "all" | undefined;
     const dateStr = c.req.query("date");
     const date = dateStr ? new Date(dateStr) : undefined;
 
-    // Fetch all halls for the dropdown
+    //To get the drop down listing all the halls
     const { hallRepository } = await import("../../Repositories/HallRepository");
     const halls = await hallRepository.getAllHalls();
 
@@ -123,12 +112,14 @@ app.get("/admin", async (c) => {
     } else {
         if (status || date) {
             if (!status || status === "pending") {
+                //Getting all pending shifts for the filter
                 shifts = await shiftRepository.getAllPendingShifts({ date });
             } else {
-                // Use the new method to fetch filtered shifts (e.g. approved)
-                shifts = await shiftRepository.getAllShifts({ status, date });
+                //Getting all shifts for the filter
+                shifts = await shiftRepository.getAllShifts({ date });
             }
         } else {
+            //Default pending shifts
             shifts = await shiftRepository.getAllPendingShifts();
         }
     }
@@ -142,27 +133,21 @@ app.get("/admin", async (c) => {
     );
 });
 
-// Approve a shift
+//Admin approving a shift
 app.patch("/:id/approve", async (c) => {
-    const user = c.get("user");
-    if (user.role !== "admin" && user.role !== "manager") return c.text("Unauthorized", 403);
-
     const id = parseInt(c.req.param("id"));
     const shift = await shiftRepository.updateShiftStatus(id, "approved");
 
-    if (!shift) return c.text("Error updating shift", 500);
+    if (!shift) return c.text("Error while updating shift", 500);
     return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
 });
 
-// Reject a shift
+//Admin rejecting a shift
 app.patch("/:id/reject", async (c) => {
-    const user = c.get("user");
-    if (user.role !== "admin" && user.role !== "manager") return c.text("Unauthorized", 403);
-
     const id = parseInt(c.req.param("id"));
     const shift = await shiftRepository.updateShiftStatus(id, "rejected");
 
-    if (!shift) return c.text("Error updating shift", 500);
+    if (!shift) return c.text("Error while updating shift", 500);
     return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
 });
 

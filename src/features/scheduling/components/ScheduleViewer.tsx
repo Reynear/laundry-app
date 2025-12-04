@@ -4,22 +4,18 @@ import { WeeklyCalendar } from "./WeeklyCalendar";
 interface ScheduleViewerProps {
     shifts: Shift[];
     filter: {
-        status?: string;
-        hallId?: number;
-        date?: string;
+        status?: string; hallId?: number; date?: string;
     };
-    halls: Hall[];
+        halls: Hall[];
 }
-
 export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) => {
-    // Determine current view from URL or default to list
-    const currentView = filter.status === "approved" ? "calendar" : "list";
+    const currentView = filter.status ==="approved" ?"calendar":"list";
 
-    // Calculate week start (Monday of current week)
+    // In order to show the weekly schedule with the approved shifts
     const getWeekStart = () => {
         const date = filter.date ? new Date(filter.date) : new Date();
         const day = date.getDay();
-        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); 
         const monday = new Date(date.setDate(diff));
         monday.setHours(0, 0, 0, 0);
         return monday;
@@ -27,21 +23,18 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
 
     const weekStart = getWeekStart();
 
-    // Sort shifts: pending first (available staff), then by date
-    const sortedShifts = [...shifts].sort((a, b) => {
-        // Priority order: pending > approved > rejected
-        const statusPriority = { pending: 0, approved: 1, rejected: 2, completed: 3, absent: 4 };
+    //Sorting shifts
+    const sortedshifts = [...shifts].sort((a, b) => {
+        const statusPriority = { pending: 0, approved: 1, rejected: 2, completed: 3};
         const aPriority = statusPriority[a.status] ?? 5;
         const bPriority = statusPriority[b.status] ?? 5;
-
         if (aPriority !== bPriority) {
             return aPriority - bPriority;
         }
-
-        // Within same status, sort by date (newest first)
-        return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+        return new Date(b.startTime).getTime()-new Date(a.startTime).getTime();
     });
-
+    
+    //Layout and information for the Admin Scheduling page
     return (
         <div className="space-y-6">
             <form action="/scheduling/admin" method="get" className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-lg">
@@ -58,14 +51,12 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
                         <option value="rejected">Rejected</option>
                         <option value="all">All Statuses</option>
                     </select>
-
                     <input
                         type="date"
                         name="date"
                         value={filter.date || ""}
                         className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
-
                     <select
                         name="hallId"
                         value={filter.hallId || ""}
@@ -83,44 +74,44 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
                 </div>
             </form>
 
-            {currentView === "calendar" && filter.status === "approved" ? (
+            {currentView ==="calendar"&&filter.status==="approved"?(
                 <div>
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-md font-semibold text-gray-700">Weekly Overview</h3>
+                        <h3 className="text-md font-semibold text-gray-700">Weekly Schedule</h3>
                         <div className="text-sm text-gray-500">
-                            Week of {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(weekStart)}
+                            Week of {new Intl.DateTimeFormat('en-US',{ month:'long', day:'numeric', year:'numeric' }).format(weekStart)}
                         </div>
                     </div>
-                    <WeeklyCalendar shifts={sortedShifts} weekStart={weekStart} />
+                    <WeeklyCalendar shifts={sortedshifts} weekstart={weekStart} />
 
-                    {/* Show list below calendar for approved shifts */}
+
+
+                    {/*Shows the shifts that have been approved by the admin*/}
                     <div className="mt-6">
-                        <h3 className="text-md font-semibold text-gray-700 mb-3">All Approved Shifts</h3>
+                        <h3 className="text-md font-semibold text-gray-700 mb-3">All Shifts</h3>
                         <div className="space-y-2">
-                            {sortedShifts.map(shift => (
+                            {sortedshifts.map(shift => (
                                 <ShiftListItem
-                                    key={shift.id}
-                                    shift={shift}
+                                    key={shift.id} shift={shift}
                                     isAdmin={true}
                                 />
                             ))}
-                            {sortedShifts.length === 0 && (
-                                <p className="text-gray-500 text-center py-8">No approved shifts found.</p>
+                            {sortedshifts.length === 0 && (
+                                <p className="text-gray-500 text-center py-8">No approved shifts are found.</p>
                             )}
                         </div>
                     </div>
                 </div>
-            ) : (
+            ):(
                 <div className="space-y-2">
-                    {sortedShifts.map(shift => (
+                    {sortedshifts.map(shift => (
                         <ShiftListItem
-                            key={shift.id}
-                            shift={shift}
+                            key={shift.id} shift={shift}
                             isAdmin={true}
                         />
                     ))}
-                    {sortedShifts.length === 0 && (
-                        <p className="text-gray-500 text-center py-8">No shifts found matching criteria.</p>
+                    {sortedshifts.length === 0 && (
+                        <p className="text-gray-500 text-center py-8">No shifts are found.</p>
                     )}
                 </div>
             )}

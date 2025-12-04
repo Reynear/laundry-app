@@ -6,23 +6,24 @@ interface RosterManagerProps {
 }
 
 export const RosterManager = ({ shifts }: RosterManagerProps) => {
-    // Calculate week start (Monday of current week)
+    //Getting the start of the week 
     const getWeekStart = () => {
         const date = new Date();
         const day = date.getDay();
-        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); 
         const monday = new Date(date.setDate(diff));
         monday.setHours(0, 0, 0, 0);
         return monday;
     };
 
+    //To use for the weekly calendar
     const weekStart = getWeekStart();
     const approvedShifts = shifts.filter(s => s.status === 'approved');
-
+    //Layout information
     return (
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-lg font-semibold mb-4">Request New Shift</h2>
+                <h2 className="text-lg font-semibold mb-4">Add A New Shift</h2>
                 <form
                     hx-post="/scheduling"
                     hx-target="#shifts-list"
@@ -32,7 +33,7 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                         const startTime = this.querySelector('[name=startTime]').value;
                         const endTime = this.querySelector('[name=endTime]').value;
                         if (endTime <= startTime) {
-                            alert('End time must be after start time');
+                            alert('End time has t0 be after start time');
                             return false;
                         }
                         return true;
@@ -54,6 +55,8 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                             type="time"
                             name="startTime"
                             required
+                            min="08:00"
+                            max="22:00"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         />
                     </div>
@@ -63,6 +66,9 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                             type="time"
                             name="endTime"
                             required
+                            //Putting in restrictions for the operating times
+                            min="08:00"
+                            max="22:00"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         />
                     </div>
@@ -75,7 +81,7 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                 </form>
             </div>
 
-            {/* Weekly Calendar for approved shifts */}
+            {/*Generating the weekly calendar to show the approved shifts*/}
             {approvedShifts.length > 0 && (
                 <div className="bg-white p-6 rounded-lg shadow">
                     <div className="flex justify-between items-center mb-4">
@@ -84,7 +90,7 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                             Week of {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(weekStart)}
                         </div>
                     </div>
-                    <WeeklyCalendar shifts={approvedShifts} weekStart={weekStart} />
+                    <WeeklyCalendar shifts={approvedShifts} weekstart={weekStart} />
                 </div>
             )}
 
@@ -98,7 +104,7 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                         />
                     ))}
                     {shifts.length === 0 && (
-                        <p className="text-gray-500">No shifts found.</p>
+                        <p className="text-gray-500">No Shifts, Free Slots</p>
                     )}
                 </div>
             </div>
