@@ -13,7 +13,17 @@ app.get("/", async (c) => {
 	if (user.role === "staff") {
 		// Staff sees notices for their hall (exclude global notices)
 		const notices = await noticeRepository.getActiveNotices(user.hallId, false);
-		return c.html(<StaffNotices user={user} notices={notices} />);
+		const halls: Hall[] = []; // Staff doesn't need hall selector
+		return c.html(<StaffNotices user={user} notices={notices} halls={halls} />);
+	}
+
+	if (user.role === "admin") {
+		// Admin sees all notices with ability to filter and manage
+		const hallFilter = c.req.query("hallId");
+		const hallId = hallFilter ? Number(hallFilter) : undefined;
+		const notices = await noticeRepository.getActiveNotices(hallId);
+		const halls = await hallRepository.getAllHalls();
+		return c.html(<StaffNotices user={user} notices={notices} halls={halls} selectedHallId={hallId} />);
 	}
 
 	// Student logic
@@ -81,8 +91,11 @@ app.get("/:id/edit", async (c) => {
 		return c.text("Notice not found", 404);
 	}
 
-	// Check permission
+	// Check permission - admins can edit any notice, staff only their hall's
 	if (user.role === "staff" && notice.hallId !== user.hallId) {
+		return c.text("Unauthorized", 403);
+	}
+	if (user.role !== "admin" && user.role !== "staff") {
 		return c.text("Unauthorized", 403);
 	}
 
@@ -212,7 +225,11 @@ app.post("/:id", async (c) => {
 	const notice = await noticeRepository.getNoticeById(id);
 	if (!notice) return c.text("Notice not found", 404);
 
+	// Check permission - admins can update any notice, staff only their hall's
 	if (user.role === "staff" && notice.hallId !== user.hallId) {
+		return c.text("Unauthorized", 403);
+	}
+	if (user.role !== "admin" && user.role !== "staff") {
 		return c.text("Unauthorized", 403);
 	}
 
@@ -238,7 +255,11 @@ app.delete("/:id", async (c) => {
 	const notice = await noticeRepository.getNoticeById(id);
 	if (!notice) return c.body(null, 404);
 
+	// Check permission - admins can delete any notice, staff only their hall's
 	if (user.role === "staff" && notice.hallId !== user.hallId) {
+		return c.text("Unauthorized", 403);
+	}
+	if (user.role !== "admin" && user.role !== "staff") {
 		return c.text("Unauthorized", 403);
 	}
 

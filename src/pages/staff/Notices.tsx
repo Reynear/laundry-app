@@ -3,17 +3,25 @@ import { DashboardLayout } from "../../layouts";
 interface StaffNoticesProps {
 	user: User;
 	notices: Notice[];
+	halls?: Hall[];
+	selectedHallId?: number;
 }
 
-export function StaffNotices({ user, notices }: StaffNoticesProps) {
+export function StaffNotices({ user, notices, halls = [], selectedHallId }: StaffNoticesProps) {
+	const isAdmin = user.role === "admin";
+	
 	return (
 		<DashboardLayout user={user} currentPath="/notices">
 			<div class="p-6 max-w-5xl mx-auto">
 				<div class="flex items-center justify-between mb-8">
 					<div>
-						<h1 class="text-2xl font-bold text-slate-900">Hall Notices</h1>
+						<h1 class="text-2xl font-bold text-slate-900">
+							{isAdmin ? "All Hall Notices" : "Hall Notices"}
+						</h1>
 						<p class="text-sm text-slate-500 mt-1">
-							Manage notices for {user.hallName || "your hall"}
+							{isAdmin 
+								? "Manage notices for all halls" 
+								: `Manage notices for ${user.hallName || "your hall"}`}
 						</p>
 					</div>
 					<button
@@ -39,6 +47,31 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 					</button>
 				</div>
 
+				{/* Hall Filter for Admins */}
+				{isAdmin && halls.length > 0 && (
+					<div class="bg-white rounded-xl border border-slate-200 p-4 mb-6">
+						<label for="hall-filter" class="block text-sm font-medium text-slate-700 mb-2">
+							Filter by Hall
+						</label>
+						<select
+							id="hall-filter"
+							name="hallId"
+							class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+							hx-get="/notices"
+							hx-target="body"
+							hx-push-url="true"
+							hx-trigger="change"
+						>
+							<option value="" selected={!selectedHallId}>All Halls</option>
+							{halls.map((hall) => (
+								<option value={hall.id} selected={selectedHallId === hall.id}>
+									{hall.name}
+								</option>
+							))}
+						</select>
+					</div>
+				)}
+
 				{/* Notices List */}
 				<div class="space-y-4">
 					{notices.length > 0 ? (
@@ -56,6 +89,11 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 											>
 												{notice.type === "alert" ? "Alert" : "Info"}
 											</span>
+											{isAdmin && (
+												<span class="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-700">
+													{notice.hallName || "Global"}
+												</span>
+											)}
 											<span class="text-xs text-slate-500">
 												{new Date(notice.publishedAt).toLocaleDateString()}
 											</span>
@@ -176,6 +214,28 @@ export function StaffNotices({ user, notices }: StaffNoticesProps) {
 							</form>
 						</div>
 						<form action="/notices" method="post" class="p-6 space-y-4">
+							{/* Hall selector for admins */}
+							{isAdmin && halls.length > 0 && (
+								<div>
+									<label
+										for="hall-select"
+										class="block text-sm font-medium text-slate-700 mb-1"
+									>
+										Hall
+									</label>
+									<select
+										id="hall-select"
+										name="hallId"
+										class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+									>
+										<option value="">Global (All Halls)</option>
+										{halls.map((hall) => (
+											<option value={hall.id}>{hall.name}</option>
+										))}
+									</select>
+								</div>
+							)}
+							
 							<div>
 								<label
 									for="title-input"
