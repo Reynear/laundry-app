@@ -68,16 +68,16 @@ const USERS_DATA = [
 	},
 	{
 		email: "staff@mymona.uwi.edu",
-		firstName: "Staff",
-		lastName: "Member",
+		firstName: "Marcus",
+		lastName: "Williams",
 		role: "staff" as const,
 		walletBalance: "0.00",
 		hallIndex: 0, // Chancellor Hall
 	},
 	{
 		email: "manager@mymona.uwi.edu",
-		firstName: "Manager",
-		lastName: "User",
+		firstName: "Patricia",
+		lastName: "Campbell",
 		role: "manager" as const,
 		walletBalance: "0.00",
 		hallIndex: 0, // Chancellor Hall

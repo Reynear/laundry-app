@@ -33,15 +33,6 @@ export function MachineCard({ machine }: MachineCardProps) {
     // 2. Machine is physically available (not out of service or maintenance)
     const showStartButton = (!hasSession || sessionStatus === "completed") && machineStatus === "available";
 
-    console.log(`Machine ${machine.id}:`, {
-        hasSession,
-        sessionStatus,
-        machineStatus,
-        showStopButton,
-        showStartButton,
-        isUsersMachine: machine.session?.isUsersMachine
-    });
-
     const getStatusColor = () => {
         switch (machine.status) {
             case "available":
