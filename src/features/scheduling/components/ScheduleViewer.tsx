@@ -47,13 +47,12 @@ export const ScheduleViewer = ({ shifts, filter, halls, isManager = false }: Sch
                 <div className="flex gap-2">
                     <select
                         name="status"
-                        value={filter.status || "pending"}
                         className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="all">All Statuses</option>
+                        <option value="pending" selected={!filter.status || filter.status === "pending"}>Pending</option>
+                        <option value="approved" selected={filter.status === "approved"}>Approved</option>
+                        <option value="rejected" selected={filter.status === "rejected"}>Rejected</option>
+                        <option value="all" selected={filter.status === "all"}>All Statuses</option>
                     </select>
                     <input
                         type="date"
@@ -64,12 +63,11 @@ export const ScheduleViewer = ({ shifts, filter, halls, isManager = false }: Sch
                     {!isManager && (
                         <select
                             name="hallId"
-                            value={filter.hallId || ""}
                             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         >
-                            <option value="">All Halls</option>
+                            <option value="" selected={!filter.hallId}>All Halls</option>
                             {halls.map(hall => (
-                                <option key={hall.id} value={hall.id}>
+                                <option key={hall.id} value={hall.id} selected={filter.hallId === hall.id}>
                                     {hall.name}
                                 </option>
                             ))}

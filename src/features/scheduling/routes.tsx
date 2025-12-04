@@ -143,6 +143,14 @@ app.patch("/:id/approve", async (c) => {
     const shift = await shiftRepository.updateShiftStatus(id, "approved");
 
     if (!shift) return c.text("Error while updating shift", 500);
+    
+    // If viewing pending filter, remove the item from the list
+    const referer = c.req.header("HX-Current-URL") || "";
+    const isPendingView = !referer.includes("status=") || referer.includes("status=pending");
+    
+    if (isPendingView) {
+        return c.body(null, 200); // Remove item from DOM
+    }
     return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
 });
 
@@ -152,6 +160,14 @@ app.patch("/:id/reject", async (c) => {
     const shift = await shiftRepository.updateShiftStatus(id, "rejected");
 
     if (!shift) return c.text("Error while updating shift", 500);
+    
+    // If viewing pending filter, remove the item from the list
+    const referer = c.req.header("HX-Current-URL") || "";
+    const isPendingView = !referer.includes("status=") || referer.includes("status=pending");
+    
+    if (isPendingView) {
+        return c.body(null, 200); // Remove item from DOM
+    }
     return c.html(<ShiftListItem shift={shift} isAdmin={true} />);
 });
 
