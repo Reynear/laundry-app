@@ -6,24 +6,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const app = new Hono();
 
-console.log('=== ENV CHECK ===');
-console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
-console.log('STRIPE_WEBHOOK_SECRET exists:', !!process.env.STRIPE_WEBHOOK_SECRET);
-console.log('All env vars:', Object.keys(process.env).filter(key => key.includes('STRIPE')));
-
-console.log('STRIPE_WEBHOOK_SECRET value:', `"${process.env.STRIPE_WEBHOOK_SECRET}"`);
-console.log('Length:', process.env.STRIPE_WEBHOOK_SECRET?.length);
-console.log('First 10 chars:', process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 10));
-console.log('Last 10 chars:', process.env.STRIPE_WEBHOOK_SECRET?.substring(process.env.STRIPE_WEBHOOK_SECRET.length - 10));
-
-// Check for invisible characters
-const secret = process.env.STRIPE_WEBHOOK_SECRET;
-if (secret) {
-    console.log('Char codes:');
-    for (let i = 0; i < Math.min(20, secret.length); i++) {
-        console.log(`  [${i}]: '${secret[i]}' (${secret.charCodeAt(i)})`);
-    }
-}
 // Checkout endpoint
 app.post("/checkout", async (c) => {
     try {
@@ -65,8 +47,8 @@ app.post("/checkout", async (c) => {
 });
 
 
-// Webhook endpoint
-app.post("/api/webhook", async (c) => {
+// Webhook endpoint - mounted at /api/payments, so this becomes /api/payments/webhook
+app.post("/webhook", async (c) => {
     try {
         const sig = c.req.header("stripe-signature");
 
@@ -126,7 +108,7 @@ app.post("/api/webhook", async (c) => {
                 console.warn('Missing userId or amount_total in session');
             }
         } else {
-            //console.log(`Received unhandled event type: ${event.type}`);
+            console.log(`Received unhandled event type: ${event.type}`);
         }
 
         return c.text("Received", 200);
