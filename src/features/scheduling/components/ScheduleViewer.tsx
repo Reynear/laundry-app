@@ -13,6 +13,13 @@ export const ScheduleViewer = ({ shifts, filter, halls, isManager = false }: Sch
     const currentView = filter.status ==="approved" ?"calendar":"list";
     const formAction = isManager ? "/scheduling/manager" : "/scheduling/admin";
 
+    // Build the polling URL with current filters
+    const queryParams = new URLSearchParams();
+    if (filter.status) queryParams.set("status", filter.status);
+    if (filter.hallId) queryParams.set("hallId", String(filter.hallId));
+    if (filter.date) queryParams.set("date", filter.date);
+    const pollUrl = `${formAction}?${queryParams.toString()}`;
+
     // In order to show the weekly schedule with the approved shifts
     const getWeekStart = () => {
         const date = filter.date ? new Date(filter.date) : new Date();
@@ -38,7 +45,13 @@ export const ScheduleViewer = ({ shifts, filter, halls, isManager = false }: Sch
     
     //Layout and information for the Admin/Manager Scheduling page
     return (
-        <div className="space-y-6">
+        <div 
+            className="space-y-6"
+            hx-get={pollUrl}
+            hx-trigger="every 15s"
+            hx-select=".space-y-6"
+            hx-swap="outerHTML"
+        >
             <form action={formAction} method="get" className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-lg">
                 <h2 className="text-lg font-semibold">
                     {isManager ? `Shift Requests - ${halls[0]?.name || "Your Hall"}` : "Shift Requests"}
