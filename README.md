@@ -10,8 +10,8 @@
   powershell -c "irm bun.sh/install.ps1 | iex"
   ```
 - **PostgreSQL**: 
-  - Download the [installer](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
-  - Or use winget: `winget install PostgreSQL.PostgreSQL`
+  - Download the [installer](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads). (this problably not going to work)
+  - Or use winget: `winget install -e --id PostgreSQL.PostgreSQL.17`
 
 ### Installation
 

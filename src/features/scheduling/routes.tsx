@@ -51,6 +51,12 @@ app.post("/", validator("form", (value, c) => {
 
     const start = new Date(`${date}T${startTime}`);
     const end = new Date(`${date}T${endTime}`);
+    const now = new Date();
+
+    // Validation: cannot create shifts in the past
+    if (start < now) {
+        return c.text("Cannot request shifts in the past", 400);
+    }
 
     // Basic validation: end time > start time
     if (end <= start) {
@@ -68,7 +74,7 @@ app.post("/", validator("form", (value, c) => {
     return c.html(<ShiftListItem shift={shift} />);
 });
 
-// Cancel a pending shift request
+// Cancel/Delete a shift request
 app.delete("/:id", async (c) => {
     const user = c.get("user");
     const id = parseInt(c.req.param("id"));
@@ -76,8 +82,14 @@ app.delete("/:id", async (c) => {
     const shift = await shiftRepository.getShiftById(id);
     if (!shift) return c.text("Shift not found", 404);
 
-    if (shift.userId !== user.id) return c.text("Unauthorized", 403);
-    if (shift.status !== "pending") return c.text("Cannot cancel non-pending shift", 400);
+    // Admins and managers can delete any shift
+    const isAdmin = user.role === "admin" || user.role === "manager";
+
+    if (!isAdmin) {
+        // Staff can only delete their own pending shifts
+        if (shift.userId !== user.id) return c.text("Unauthorized", 403);
+        if (shift.status !== "pending") return c.text("Cannot cancel non-pending shift", 400);
+    }
 
     await shiftRepository.deleteShift(id);
     return c.body(null); // Return empty body to remove the element

@@ -27,6 +27,21 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
 
     const weekStart = getWeekStart();
 
+    // Sort shifts: pending first (available staff), then by date
+    const sortedShifts = [...shifts].sort((a, b) => {
+        // Priority order: pending > approved > rejected
+        const statusPriority = { pending: 0, approved: 1, rejected: 2, completed: 3, absent: 4 };
+        const aPriority = statusPriority[a.status] ?? 5;
+        const bPriority = statusPriority[b.status] ?? 5;
+
+        if (aPriority !== bPriority) {
+            return aPriority - bPriority;
+        }
+
+        // Within same status, sort by date (newest first)
+        return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+    });
+
     return (
         <div className="space-y-6">
             <form action="/scheduling/admin" method="get" className="flex flex-wrap gap-4 justify-between items-center bg-gray-50 p-4 rounded-lg">
@@ -76,20 +91,20 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
                             Week of {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(weekStart)}
                         </div>
                     </div>
-                    <WeeklyCalendar shifts={shifts} weekStart={weekStart} />
+                    <WeeklyCalendar shifts={sortedShifts} weekStart={weekStart} />
 
                     {/* Show list below calendar for approved shifts */}
                     <div className="mt-6">
                         <h3 className="text-md font-semibold text-gray-700 mb-3">All Approved Shifts</h3>
                         <div className="space-y-2">
-                            {shifts.map(shift => (
+                            {sortedShifts.map(shift => (
                                 <ShiftListItem
                                     key={shift.id}
                                     shift={shift}
                                     isAdmin={true}
                                 />
                             ))}
-                            {shifts.length === 0 && (
+                            {sortedShifts.length === 0 && (
                                 <p className="text-gray-500 text-center py-8">No approved shifts found.</p>
                             )}
                         </div>
@@ -97,14 +112,14 @@ export const ScheduleViewer = ({ shifts, filter, halls }: ScheduleViewerProps) =
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {shifts.map(shift => (
+                    {sortedShifts.map(shift => (
                         <ShiftListItem
                             key={shift.id}
                             shift={shift}
                             isAdmin={true}
                         />
                     ))}
-                    {shifts.length === 0 && (
+                    {sortedShifts.length === 0 && (
                         <p className="text-gray-500 text-center py-8">No shifts found matching criteria.</p>
                     )}
                 </div>

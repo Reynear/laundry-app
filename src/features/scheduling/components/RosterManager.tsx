@@ -1,15 +1,43 @@
 import { ShiftListItem } from "./ShiftListItem";
+import { WeeklyCalendar } from "./WeeklyCalendar";
 
 interface RosterManagerProps {
     shifts: Shift[];
 }
 
 export const RosterManager = ({ shifts }: RosterManagerProps) => {
+    // Calculate week start (Monday of current week)
+    const getWeekStart = () => {
+        const date = new Date();
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+        const monday = new Date(date.setDate(diff));
+        monday.setHours(0, 0, 0, 0);
+        return monday;
+    };
+
+    const weekStart = getWeekStart();
+    const approvedShifts = shifts.filter(s => s.status === 'approved');
+
     return (
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-lg font-semibold mb-4">Add A New Shift</h2>
-                <form hx-post="/scheduling" hx-target="#shifts-list" hx-swap="afterbegin" className="flex gap-4 items-end">
+                <h2 className="text-lg font-semibold mb-4">Request New Shift</h2>
+                <form
+                    hx-post="/scheduling"
+                    hx-target="#shifts-list"
+                    hx-swap="afterbegin"
+                    className="flex gap-4 items-end"
+                    onsubmit="
+                        const startTime = this.querySelector('[name=startTime]').value;
+                        const endTime = this.querySelector('[name=endTime]').value;
+                        if (endTime <= startTime) {
+                            alert('End time must be after start time');
+                            return false;
+                        }
+                        return true;
+                    "
+                >
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Date</label>
                         <input
@@ -46,6 +74,19 @@ export const RosterManager = ({ shifts }: RosterManagerProps) => {
                     </button>
                 </form>
             </div>
+
+            {/* Weekly Calendar for approved shifts */}
+            {approvedShifts.length > 0 && (
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-semibold">My Schedule</h2>
+                        <div className="text-sm text-gray-500">
+                            Week of {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(weekStart)}
+                        </div>
+                    </div>
+                    <WeeklyCalendar shifts={approvedShifts} weekStart={weekStart} />
+                </div>
+            )}
 
             <div>
                 <h2 className="text-lg font-semibold mb-4">My Shifts</h2>

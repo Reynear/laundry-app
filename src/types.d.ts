@@ -100,3 +100,14 @@ declare module "hono" {
 		user: User;
 	}
 }
+
+interface MachineWithSession extends Machine {
+  session: MachineSession | null;
+  hasActiveAppointment: boolean;
+  appointmentDetails?: {
+    id: number;
+    userId: number;
+    userName: string;
+    appointmentDatetime: Date;
+  };
+}

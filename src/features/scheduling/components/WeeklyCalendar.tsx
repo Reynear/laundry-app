@@ -58,13 +58,13 @@ export const WeeklyCalendar = ({ shifts, weekStart }: WeeklyCalendarProps) => {
                                     <div
                                         key={shift.id}
                                         className={`text-xs p-2 rounded border ${shift.status === 'approved'
-                                                ? 'bg-green-50 border-green-200 text-green-800'
-                                                : shift.status === 'pending'
-                                                    ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                                                    : 'bg-gray-50 border-gray-200 text-gray-600'
+                                            ? 'bg-green-50 border-green-200 text-green-800'
+                                            : shift.status === 'pending'
+                                                ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                                                : 'bg-gray-50 border-gray-200 text-gray-600'
                                             }`}
                                     >
-                                        <div className="font-medium truncate">{shift.staffName || 'Unknown'}</div>
+                                        <div className="font-medium truncate">{shift.staffName || 'My Shift'}</div>
                                         <div className="text-xs">
                                             {formatTime(new Date(shift.startTime))} - {formatTime(new Date(shift.endTime))}
                                         </div>

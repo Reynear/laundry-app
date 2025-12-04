@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { db } from "../db";
 import { halls, machineSessions, machines } from "../db/schema/schema";
 
@@ -26,6 +26,10 @@ function mapToSession(
 		hallName: row.hallName || undefined,
 	};
 }
+
+type MachineWithSession = typeof machines.$inferSelect & {
+	session?: MachineSession | null;
+};
 
 class MachineSessionRepository {
 	/**
@@ -111,6 +115,70 @@ class MachineSessionRepository {
 		if (rows.length === 0) throw new Error("Failed to create session");
 		return mapToSession(rows[0], data.startedByUserId);
 	}
+
+	/**
+	 * Get machines with active sessions
+	 */
+	async getMachinesWithSessions(
+		hallId: number,
+		currentUserId = 0,
+	): Promise<MachineWithSession[]> {
+		// fetch machines for the hall
+		const machineRows = await db
+			.select()
+			.from(machines)
+			.where(eq(machines.hallId, hallId));
+
+		if (machineRows.length === 0) return [];
+
+		const machineIds = machineRows.map((m) => m.id);
+
+		// fetch running sessions for those machines, include machine type and hall name for mapping
+		const sessionRows = await db
+			.select({
+				...getTableColumns(machineSessions),
+				machineType: machines.type,
+				hallName: halls.name,
+			})
+			.from(machineSessions)
+			.innerJoin(machines, eq(machineSessions.machineId, machines.id))
+			.innerJoin(halls, eq(machines.hallId, halls.id))
+			.where(
+				and(
+					eq(machineSessions.status, "running"),
+					inArray(machineSessions.machineId, machineIds),
+				),
+			);
+
+		// build a map machineId -> session
+		const sessionMap = new Map<number, SessionDbResult>();
+		for (const s of sessionRows as SessionDbResult[]) {
+			sessionMap.set(s.machineId, s);
+		}
+
+		// attach session (if any) to each machine
+		const results: MachineWithSession[] = machineRows.map((m) => {
+			const sessionRow = sessionMap.get(m.id);
+			return {
+				...m,
+				session: sessionRow ? mapToSession(sessionRow, currentUserId) : null,
+			};
+		});
+
+		return results;
+	}
+
+	/**
+	 * End a session
+	 */
+	async endSession(sessionId: number): Promise<void> {
+		await db
+			.update(machineSessions)
+			.set({ status: "completed", actualEndTime: new Date() })
+			.where(eq(machineSessions.id, sessionId));
+	}
 }
 
 export const machineSessionRepository = new MachineSessionRepository();
+
+

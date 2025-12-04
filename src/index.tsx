@@ -13,6 +13,7 @@ import payments from "./features/payments/routes";
 import settings from "./features/settings/routes";
 import { userRepository } from "./Repositories/UserRepository";
 import scheduling from "./features/scheduling/routes";
+import routes from "./features/timers/routes";
 
 import app from './features/payments/api';
 
@@ -66,7 +67,8 @@ app.use("/payments/*", authMiddleware);
 app.use("/settings/*", authMiddleware);
 app.use("/api/notifications/*", authMiddleware);
 app.use("/scheduling/*", authMiddleware);
-
+app.use("/timers/*", authMiddleware);
+app.route("/timers", routes);
 app.route("/dashboard", dashboard);
 app.route("/appointments", appointments);
 app.route("/notices", notices);
@@ -83,7 +85,7 @@ app.get("/", async (c) => {
 	);
 	if (sessionId) {
 		const user = await userRepository.getUserById(parseInt(sessionId, 10));
-		if (user && user.role === "staff") {
+		if (user && (user.role === "staff" || user.role === "admin" || user.role === "manager")) {
 			return c.redirect("/appointments");
 		}
 		return c.redirect("/dashboard");
