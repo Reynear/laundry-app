@@ -58,7 +58,7 @@ auth.post("/login", async (c) => {
 			},
 		);
 
-		if (user.role === "staff") {
+		if (user.role === "staff" || user.role === "admin" || user.role === "manager") {
 			c.header("HX-Redirect", "/appointments?toast=login_success");
 		} else {
 			c.header("HX-Redirect", "/dashboard?toast=login_success");

@@ -30,17 +30,15 @@ export class ShiftRepository {
 	// Get all shifts for a hall (for admin)
 	async getShiftsByHall(hallId: number, filter?: { status?: ShiftStatus; date?: Date }): Promise<Shift[]> {
 		const conditions = [eq(shifts.hallId, hallId)];
-		if (filter?.status && filter.status !== "all" as any) {
+		if (filter?.status && filter.status !== ("all" as any)) {
 			conditions.push(eq(shifts.status, filter.status));
 		}
 		if (filter?.date) {
 			const nextDay = new Date(filter.date);
 			nextDay.setDate(nextDay.getDate() + 1);
 			conditions.push(
-				and(
-					gte(shifts.startTime, filter.date),
-					lte(shifts.startTime, nextDay)
-				)
+				gte(shifts.startTime, filter.date),
+				lte(shifts.startTime, nextDay)
 			);
 		}
 		const result = await db
@@ -95,7 +93,7 @@ export class ShiftRepository {
 	// Get all shifts (for admin view with filters)
 	async getAllShifts(filter?: { status?: ShiftStatus; date?: Date }): Promise<Shift[]> {
 		const conditions = [];
-		if (filter?.status && filter.status !== "all" as any) {
+		if (filter?.status && filter.status !== ("all" as any)) {
 			conditions.push(eq(shifts.status, filter.status));
 		}
 		if (filter?.date) {
@@ -108,7 +106,7 @@ export class ShiftRepository {
 				)
 			);
 		}
-		const result = await db
+		const query = db
 			.select({
 				id: shifts.id,
 				userId: shifts.userId,
@@ -121,9 +119,11 @@ export class ShiftRepository {
 			})
 			.from(shifts)
 			.leftJoin(users, eq(shifts.userId, users.id))
-			.leftJoin(halls, eq(shifts.hallId, halls.id))
-			.where(and(...conditions))
-			.orderBy(desc(shifts.startTime));
+			.leftJoin(halls, eq(shifts.hallId, halls.id));
+		
+		const result = conditions.length > 0
+			? await query.where(and(...conditions)).orderBy(desc(shifts.startTime))
+			: await query.orderBy(desc(shifts.startTime));
 		return result as Shift[];
 	}
 	// Get single shift
