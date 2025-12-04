@@ -258,17 +258,6 @@ async function seed() {
 			{
 				userId: studentUser.id,
 				hallId: chancellorHall.id,
-				machineId: chancellorWashers[1]?.id ?? null, // W-02 (available)
-				appointmentDatetime: createDate(1, 10, 0), // Tomorrow 10:00 AM
-				durationMins: 45,
-				serviceType: "wash" as const,
-				status: "pending" as const,
-				totalCost: chancellorHallPrices.washerPrice,
-				createdAt: new Date(now.getTime() - 1 * 60 * 60 * 1000),
-			},
-			{
-				userId: studentUser.id,
-				hallId: chancellorHall.id,
 				machineId: chancellorWashers[3]?.id ?? null, // W-04 (available)
 				appointmentDatetime: createDate(-1, 14, 0), // Yesterday 2:00 PM
 				durationMins: 45,

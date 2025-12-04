@@ -5,3 +5,6 @@ drizzle
 .DS_Store
 .claude
 .github
+docs
+TEST_PLAN.md
+.vscode
