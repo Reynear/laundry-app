@@ -4,3 +4,4 @@ node_modules/
 drizzle
 .DS_Store
 .claude
+.github
