@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { getSignedCookie } from "hono/cookie";
@@ -13,7 +14,8 @@ import settings from "./features/settings/routes";
 import { userRepository } from "./Repositories/UserRepository";
 import scheduling from "./features/scheduling/routes";
 
-const app = new Hono();
+import app from './features/payments/api';
+
 
 // Serve static files
 app.use("/output.css", serveStatic({ path: "./src/output.css" }));
@@ -27,8 +29,11 @@ app.use(
 );
 app.use("/favicon.ico", serveStatic({ path: "./src/favicon.ico" }));
 
+import paymentsApi from "./features/payments/api";
+
 // Public Routes
 app.route("/api", auth);
+app.route("/api/payments", paymentsApi);
 app.route("/", authPages);
 
 // Auth Middleware

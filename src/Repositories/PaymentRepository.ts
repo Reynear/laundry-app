@@ -103,6 +103,37 @@ class PaymentRepository {
 	}
 
 	/**
+	 * Add credits from Stripe payment (webhook)
+	 * Checks for idempotency using stripePaymentId
+	 */
+	async addCreditsFromStripe(
+		stripePaymentId: string,
+		amountCents: number,
+		userId: number,
+	): Promise<{ success: boolean; newBalance: number; alreadyProcessed: boolean }> {
+		// Check if payment already exists
+		const existingPayment = await db
+			.select()
+			.from(payments)
+			.where(eq(payments.stripePaymentId, stripePaymentId));
+
+		if (existingPayment.length > 0) {
+			const currentBalance = await this.getUserBalance(userId);
+			return {
+				success: true,
+				newBalance: currentBalance,
+				alreadyProcessed: true,
+			};
+		}
+
+		const amount = amountCents / 100;
+		return {
+			...(await this.addCredits(userId, amount, stripePaymentId)),
+			alreadyProcessed: false,
+		};
+	}
+
+	/**
 	 * Validate that a user can book an appointment with the given cost
 	 * Returns validation result with current balance info
 	 */

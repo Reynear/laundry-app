@@ -16,9 +16,11 @@
 	"dependencies": {
 		"@tailwindcss/cli": "^4.1.17",
 		"basecoat-css": "^0.3.6",
+		"dotenv": "^17.2.3",
 		"drizzle-orm": "^0.44.7",
 		"hono": "^4.10.7",
 		"knip": "^5.70.2",
+		"stripe": "^20.0.0",
 		"tailwindcss": "^4.1.17"
 	},
 	"devDependencies": {
