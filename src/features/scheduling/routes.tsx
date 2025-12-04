@@ -85,7 +85,7 @@ app.delete("/:id", async (c) => {
     const shift = await shiftRepository.getShiftById(id);
     if (!shift) return c.text("Shift not found", 404);
 
-   
+
     //Admin deleting shifts
     await shiftRepository.deleteShift(id);
     return c.body(null, 200);
@@ -115,17 +115,16 @@ app.get("/admin", async (c) => {
             date
         });
     } else {
-        if (status || date) {
-            if (!status || status === "pending") {
-                //Getting all pending shifts for the filter
-                shifts = await shiftRepository.getAllPendingShifts({ date });
-            } else {
-                //Getting all shifts for the filter
-                shifts = await shiftRepository.getAllShifts({ date });
-            }
+        // To handle different filters
+        if (status === "pending" || !status) {
+            // Default to pending shifts
+            shifts = await shiftRepository.getAllPendingShifts({ date });
+        } else if (status === "all") {
+            // Get all shifts 
+            shifts = await shiftRepository.getAllShifts({ date });
         } else {
-            //Default pending shifts
-            shifts = await shiftRepository.getAllPendingShifts();
+            // Get shifts specific to approved, rejected 
+            shifts = await shiftRepository.getAllShifts({ date, status });
         }
     }
 
